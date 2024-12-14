@@ -2,7 +2,7 @@
 @discription  : Copyright © 2021-2024 Blue Summer Studio. All rights reserved.
 @Author       : Niu zhixin
 @Date         : 2024-10-19 15:12:58
-@LastEditTime : 2024-12-14 15:49:07
+@LastEditTime : 2024-12-14 16:50:53
 @LastEditors  : Niu zhixin
 '''
 import json
@@ -188,12 +188,12 @@ class server:
                 delete = server_conns.count(conn)
                 print(delete)
                 print(server_users)
-                receives.insert(END,'[系统提示]'+server_users[delete-1]+'退出群聊！','system')
+                receives.insert(END,'[系统提示]'+server_users[delete]+'退出群聊！','system')
                 receives.insert(END,'\n')
                 server_conns.pop(delete-1)
-                self.send_all(server_conns,conn,'[系统提示]'+server_users[delete-1]+'退出群聊！')
-                self.send_all(server_conns,conn,'[系统提示]user_delete:'+server_users[delete-1])
-                server_users.pop(delete-1)
+                self.send_all(server_conns,conn,'[系统提示]'+server_users[delete]+'退出群聊！')
+                self.send_all(server_conns,conn,'[系统提示]user_delete:'+server_users[delete])
+                server_users.pop(delete)
                 member.delete(server_iid[delete-1])
                 server_iid.pop(delete-1)
                 break
@@ -299,16 +299,16 @@ class client():
                 self.MenuHelp(self.window)
     
     def expression(self):
-        global buttons,expression_button,expression_choose
+        global buttons,client_expression_button,expression_choose
         expression_choose = Toplevel(self.window)
         for i in range(11):
             for j in range(6):
                 button = Button(expression_choose,text=client_expression[(i-1)*6+j],command=lambda i=i,j=j:self.expressions(i,j),width=3)
                 button.grid(column=i,row=j)
-                buttons[i,j] = button
-                expression_button[i,j] = client_expression[(i-1)*6+j]
+                client_buttons[i,j] = button
+                client_expression_button[i,j] = client_expression[(i-1)*6+j]
     
-    def destroied(master:Tk) -> None:
+    def destroied(self,master:Tk) -> None:
         master.withdraw()
         try:
             expression_choose.withdraw()
@@ -412,7 +412,7 @@ def cmain(passwords):
     global socket_client,client_root,icon
     socket_client = socket.socket(family=socket.AF_INET,type=socket.SOCK_STREAM)
     socket_client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    socket_client.connect(('192.168.101.38',30247))
+    socket_client.connect(('192.168.2.107',30247))
     print(1)
     print(passwords)
     #// while True:
@@ -444,9 +444,8 @@ def cmain(passwords):
         client_root = Toplevel()
         main = client(client_root)
         main.__set__()
-        func_receive = client.receive(main)
-        func_receive.start()
-        client_root.protocol('WM_DELETE_WINDOW',lambda:client.destroied(client,client_root))
+        threading.Thread(target=main.receive).start()
+        client_root.protocol('WM_DELETE_WINDOW',lambda:main.destroied(client_root))
         client_root.mainloop()
 
 
