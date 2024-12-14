@@ -2,7 +2,7 @@
 @discription  : Copyright © 2021-2024 Blue Summer Studio. All rights reserved.
 @Author       : Niu zhixin
 @Date         : 2024-10-19 15:12:58
-@LastEditTime : 2024-12-08 19:45:33
+@LastEditTime : 2024-12-14 15:49:07
 @LastEditors  : Niu zhixin
 '''
 import json
@@ -18,14 +18,10 @@ from tkinter import *
 from tkinter.scrolledtext import ScrolledText
 from tkinter.messagebox import askyesnocancel,showwarning
 from tkinter.filedialog import asksaveasfilename,askopenfilename
-from tkinter.ttk import Treeview,Notebook,Button,Label,Labelframe,Combobox,Style
+from tkinter.ttk import Treeview,Notebook,Button,Labelframe,Combobox,Style
 from typing import NoReturn
 from PIL import Image,ImageTk
 import re
-
-#!! 即将被弃用
-from LNSS import client
-
 
 server_users = [socket.gethostname()]
 server_conns = []
@@ -249,6 +245,212 @@ def smain(password_type):
     server_root.mainloop()
 
 
+client_users = []
+client_expression_button = {}
+client_buttons = {}
+client_expression = list('😀😁😂🤣😃😄😅😆😉😊😋😎😍😘🥰😗😙🥲😚🙂🤗🤩🤔🫡🤨😐😑😶🫥🙄😏😣😥😮🤐😯😪😫🥱😴😌😛😜😝🤤😒😓😔😕🫤🙃🫠🤑😲🙁😖😞😟😤😢😭😦😧😨😩🤯😬😮‍💨😰😱🥵🥶😳🤪😵😵‍💫🥴😠😡🤬😷🤒🤕🤢🤮🤧😇🥳🥸🥺🥹🤠🤡🤥🫨🙂‍↔️🙂‍↕️🤫🤭🫢🫣🧐🤓😈👿👹👺💀☠️👻👽👾🤖💩😺😸😹😻😼😽🙀😿😾🙈🙉🙊🐵🐶🐺🐱🦁🐯🦒🦝🦊🐮🐷🐗🐭🐹🐰🐸🐼🐨🐻‍❄️🐻🦓🐲🐔🦄🫏🫎🐴🐽🐾🐒🦍🦧🦮🐅🐈‍⬛🐈🐕🐩🐕‍🦺🐆🐎🦌🦬🦏🦛🐑🐏🐖🐄🐃🐂🐐🐪🐫🦙🦘🦥🐀🐁🦣🐘🦡🦨🦔🐇🐿️🦫🦎🐊🦦🦖🦕🐉🐍🐢🦈🐬🦭🐳🐋🐟🦞🐙🦑🦐🐡🐠🦀🐚🪸🪼🦆🦟')
+
+class client():
+    def __init__(self,window:Tk) -> None:
+        self.window = window
+    
+    def __set__(self) -> None:
+        global receives,member,menubar,about,other,is_alt,settings_value,settings_option,style,font_size,sends,INPUT
+        font_size = ('楷体',12)
+        style = Style()
+        style.configure('LNSS.Treeview',font=font_size)
+        is_alt = False
+        root = self.window
+        root.geometry('640x480')
+        root.title('socket client')
+        root.resizable(False,False)
+        root.iconphoto(False, PhotoImage(file=f'{os.getcwd()}\\Lib\\show.png'))
+        receives = ScrolledText(root,background='#f2f2f2',cursor='arrow',wrap=WORD)
+        receives.place(x=5,y=0,width=490,height=310)
+        receives.tag_config('mine',foreground='#000000',background='#43a649',font=font_size)
+        receives.tag_config('others',foreground='#000000',background='#ffffff',font=font_size)
+        receives.tag_config('system',foreground='#ff0000',background='#ffff00',font=font_size)
+        receives.tag_config('message',foreground='#000000',background='#ffffff',font=font_size)
+        member = Treeview(root,show='headings',columns='NAME',style='LNSS.Treeview')
+        member.place(x=495,y=0,width=145,height=310)
+        member.column('NAME',width=145)
+        member.heading('NAME',text='当前在线：')
+        for user in client_users: member.insert('',END,values=user+'\n')
+        member.update()
+        INPUT = StringVar()
+        INPUT.set('')
+        sends = Entry(root,width=110,textvariable=INPUT)
+        sends.place(x=5,y=310,width=545,height=170)
+        sending = Button(root,text='发送',command=lambda:self.send(sends.get(),INPUT))
+        sending.place(x=552,y=310)
+        expressions = Button(root,text='表情',command=lambda:self.expression())
+        expressions.place(x=552,y=335)
+        menubar = Menu(root)
+        root.config(menu=menubar)
+        about = Menu(menubar,tearoff=0)
+        about.add_command(label='关于...(A)',command=lambda:self.MenuHelp(root),accelerator='Ctrl+A',underline=6)
+        about.add_command(label='帮助(H)',command=lambda:self.MenuHelp(root),accelerator='F1',underline=4)
+        menubar.add_cascade(label='关于(A)',menu=about,underline=3)
+        root.bind('<Key>',lambda event:self.onkey(event))
+    
+    def onkey(self,event:Event) -> None:
+        if event.state in (4,6,12,14,36,38,44,46):
+            if event.keysym.upper() == 'A':
+                self.MenuHelp(self.window)
+    
+    def expression(self):
+        global buttons,expression_button,expression_choose
+        expression_choose = Toplevel(self.window)
+        for i in range(11):
+            for j in range(6):
+                button = Button(expression_choose,text=client_expression[(i-1)*6+j],command=lambda i=i,j=j:self.expressions(i,j),width=3)
+                button.grid(column=i,row=j)
+                buttons[i,j] = button
+                expression_button[i,j] = client_expression[(i-1)*6+j]
+    
+    def destroied(master:Tk) -> None:
+        master.withdraw()
+        try:
+            expression_choose.withdraw()
+        except:
+            pass
+    
+    def menu(item) -> None:
+        print(item)
+        if str(item) == '显示':
+            client_root.deiconify()
+        elif str(item) == '退出':
+            is_destroy = askyesnocancel('警告！','一但关闭程序，所有连接将断开（无法恢复！）')
+            print(is_destroy)
+            if not is_destroy is None:
+                if is_destroy:
+                    threading.Thread(target=icon.stop,daemon=True).start()
+                    socket_client.close()
+                    client_root.quit()
+                    client_root.destroy()
+                    icon.stop()
+    
+    def Menuhelp(master:Tk) -> None:
+        about = Toplevel(master)
+        about.title('关于')
+        about.geometry('300x160+350+200')
+        about.resizable(False,False)
+        about.iconphoto(False, PhotoImage(file=f'{os.getcwd()}\\data\\Lib\\show.png'))
+        Label(about, image=Image_load.__load__(master,f'{os.getcwd()}\\data\\Lib\\show.png',(64,64))).place(x=20,y=40)
+        Label(about, text='LNSS,版本 '+VERSION+'\n\n版权所有(c)2024', font=('华文新魏', 11), justify=LEFT).place(x=120,y=40)
+    
+    def get_data(self,root:Tk,data_from:list) -> None:
+        global IP
+        datas = []
+        for data in data_from:
+            datas.append(str(data.get()))
+        IP = '.'.join(datas)
+        root.destroy()
+    
+    def askIP(self,root:Tk) -> None:
+        root.title('IP地址')
+        Label(root,text='请输入服务器端的IP地址：',anchor=W).grid(column=0,row=0,columnspan=7)
+        n = 1
+        data_from = []
+        for i in [192,168,1,1]:
+            stv = IntVar()
+            ip = Spinbox(root,from_=1,to=255,textvariable=stv,width=8)
+            stv.set(i)
+            ip.grid(column=2*n-1,row=1)
+            data_from.append(stv)
+            if n == 4:
+                pass
+            else:
+                Label(root,text='.').grid(column=2*n,row=1)
+            n += 1
+        Button(text='确认',command=lambda: self.get_data(root,data_from)).grid(column=3,row=2)
+        Button(text='取消',command=lambda: os._exit(0)).grid(column=5,row=2)
+        root.mainloop()
+        
+    def send(self,msg,INPUT:StringVar) -> None:
+        if msg != '':
+            socket_client.send((socket.gethostname()+':'+msg).encode("UTF-8"))
+            INPUT.set('')
+            receives.insert(END,socket.gethostname()+':','mine')
+            receives.insert(END,msg,'message')
+            receives.insert(END,'\n')
+        else:
+            showwarning('警告！','发布内容不能为空！')
+    
+    def receive(self) -> NoReturn:
+        while True:
+            try:
+                data = socket_client.recv(1024).decode("UTF-8")
+                if data[0:6]=='[系统提示]':
+                    if data[6:18] == 'user_append:':
+                        print('APPEND')
+                        client_users.append(data[17:])
+                        member.insert('',END,values=data[17:])
+                    elif data[6:18] == 'user_delete:':
+                        print('DELETE')
+                        delete = client_users.count(data[17:])
+                        member.delete(delete)
+                        client_users.pop(delete)
+                    elif data == '[系统提示]服务器已关闭连接，即将退出程序！':
+                        time.sleep(5)
+                        socket_client.close()
+                        client_root.quit()
+                        client_root.destroy()
+                    else:
+                        receives.insert(END,data,'system')
+                        receives.insert(END,'\n')
+                        print('SYSTEM')
+                        receives.see(END)
+                else:
+                    receives.insert(END,data,'others')
+                    receives.insert(END,'\n')
+                    receives.see(END)
+            except:
+                break
+
+def cmain(passwords):
+    global socket_client,client_root,icon
+    socket_client = socket.socket(family=socket.AF_INET,type=socket.SOCK_STREAM)
+    socket_client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    socket_client.connect(('192.168.101.38',30247))
+    print(1)
+    print(passwords)
+    #// while True:
+    #//     ask = Tk()
+    #//     askIP(ask)
+    #//     try:
+    #//         socket_client.settimeout(5)
+    #//         socket_client.connect((IP,1024))
+    #//         socket_client.settimeout(None)
+    #//         break
+    #//     except:
+    #//         showwarning('警告！','IP地址不符合规定！请重试！')
+
+    check = False
+    password = socket_client.recv(1024).decode('utf-8')
+    print(2)
+    print(password)
+    if password != 'no_password':
+        if passwords == password:
+            check = True
+    else:
+        check = True
+        print(check)
+    if check:
+        socket_client.send(password.encode('utf-8'))
+        socket_client.send(socket.gethostname().encode('utf-8'))
+        client_users = json.loads(socket_client.recv(1024).decode('utf-8'))
+        print(client_users)
+        client_root = Toplevel()
+        main = client(client_root)
+        main.__set__()
+        func_receive = client.receive(main)
+        func_receive.start()
+        client_root.protocol('WM_DELETE_WINDOW',lambda:client.destroied(client,client_root))
+        client_root.mainloop()
+
+
+
 class Demo():
     def __init__(self,window:Tk|None=None) -> None:
         if not window is None:
@@ -304,7 +506,7 @@ class Demo():
         
         Label(client_page,text=f'网络：{self.get_wifi()}').grid(column=0,row=1,sticky=NW)
         
-        Button(client_page,text='加入',command=lambda:client.main(self.cpassword.get())).grid(column=0,row=2,columnspan=3,rowspan=4)
+        Button(client_page,text='加入',command=lambda:cmain(self.cpassword.get())).grid(column=0,row=2,columnspan=3,rowspan=4)
         
         
         
