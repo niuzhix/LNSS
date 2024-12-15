@@ -2,14 +2,13 @@
 @discription  : Copyright © 2021-2024 Blue Summer Studio. All rights reserved.
 @Author       : Niu zhixin
 @Date         : 2024-10-19 15:12:58
-@LastEditTime : 2024-12-14 16:50:53
+@LastEditTime : 2024-12-15 17:19:07
 @LastEditors  : Niu zhixin
 '''
 import json
 import socket
-import math
 #// import logging
-import pystray
+# //import pystray
 import threading
 import time
 import secrets
@@ -485,10 +484,6 @@ class Demo():
         
         Label(server_page,text=f'网络：{self.get_wifi()}').grid(column=0,row=4,sticky=NW)
         
-        Label(server_page,text='人数上限：\n（0为不限制）').grid(column=0,row=5)
-        num = Entry(server_page,validate='focusout',validatecommand=self.check_int)
-        num.grid(column=1,row=5,columnspan=2,sticky=NW)
-        
         Button(server_page,text='创建',command=lambda:smain(self.password.get())).grid(column=0,row=9,columnspan=3,rowspan=4)
         
         
@@ -498,12 +493,15 @@ class Demo():
         client_page = Frame(main_page)
         client_page.pack(fill=BOTH)
         
-        Label(client_page,text='密码：').grid(column=0,row=0,sticky=NW)
+        Label(client_page,text='主机地址：').grid(column=0,row=0,sticky=NW)
+        cip = Entry(client_page,validate='focusout')
+        
+        Label(client_page,text='密码：').grid(column=0,row=1,sticky=NW)
         cpassword = Entry(client_page,validate='focusout',validatecommand=self.check_password)
-        cpassword.grid(column=1,row=0)
+        cpassword.grid(column=1,row=1)
         self.cpassword = cpassword
         
-        Label(client_page,text=f'网络：{self.get_wifi()}').grid(column=0,row=1,sticky=NW)
+        Label(client_page,text=f'网络：{self.get_wifi()}').grid(column=0,row=2,sticky=NW)
         
         Button(client_page,text='加入',command=lambda:cmain(self.cpassword.get())).grid(column=0,row=2,columnspan=3,rowspan=4)
         
