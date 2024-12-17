@@ -2,7 +2,7 @@
 @discription  : Copyright © 2021-2024 Blue Summer Studio. All rights reserved.
 @Author       : Niu zhixin
 @Date         : 2024-10-19 15:12:58
-@LastEditTime : 2024-12-15 17:19:07
+@LastEditTime : 2024-12-17 18:42:33
 @LastEditors  : Niu zhixin
 '''
 import json
@@ -407,11 +407,11 @@ class client():
             except:
                 break
 
-def cmain(passwords):
+def cmain(passwords,ips):
     global socket_client,client_root,icon
     socket_client = socket.socket(family=socket.AF_INET,type=socket.SOCK_STREAM)
     socket_client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    socket_client.connect(('192.168.2.107',30247))
+    socket_client.connect((ips,30247))
     print(1)
     print(passwords)
     #// while True:
@@ -495,6 +495,7 @@ class Demo():
         
         Label(client_page,text='主机地址：').grid(column=0,row=0,sticky=NW)
         cip = Entry(client_page,validate='focusout')
+        cip.grid(column=1,row=0)
         
         Label(client_page,text='密码：').grid(column=0,row=1,sticky=NW)
         cpassword = Entry(client_page,validate='focusout',validatecommand=self.check_password)
@@ -503,7 +504,7 @@ class Demo():
         
         Label(client_page,text=f'网络：{self.get_wifi()}').grid(column=0,row=2,sticky=NW)
         
-        Button(client_page,text='加入',command=lambda:cmain(self.cpassword.get())).grid(column=0,row=2,columnspan=3,rowspan=4)
+        Button(client_page,text='加入',command=lambda:cmain(self.cpassword.get(),cip.get())).grid(column=0,row=3,columnspan=3,rowspan=4)
         
         
         
