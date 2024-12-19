@@ -2,7 +2,7 @@
 @discription  : Copyright © 2021-2024 Blue Summer Studio. All rights reserved.
 @Author       : Niu zhixin
 @Date         : 2024-10-19 15:12:58
-@LastEditTime : 2024-12-17 18:42:33
+@LastEditTime : 2024-12-19 16:06:24
 @LastEditors  : Niu zhixin
 '''
 import json
@@ -182,6 +182,7 @@ class server:
                 receives.insert(END,'\n')
                 receives.see(END)
                 receives.update()
+                print(data)
                 self.send_all(user,conn,data)
             except:
                 delete = server_conns.count(conn)
@@ -345,26 +346,7 @@ class client():
             datas.append(str(data.get()))
         IP = '.'.join(datas)
         root.destroy()
-    
-    def askIP(self,root:Tk) -> None:
-        root.title('IP地址')
-        Label(root,text='请输入服务器端的IP地址：',anchor=W).grid(column=0,row=0,columnspan=7)
-        n = 1
-        data_from = []
-        for i in [192,168,1,1]:
-            stv = IntVar()
-            ip = Spinbox(root,from_=1,to=255,textvariable=stv,width=8)
-            stv.set(i)
-            ip.grid(column=2*n-1,row=1)
-            data_from.append(stv)
-            if n == 4:
-                pass
-            else:
-                Label(root,text='.').grid(column=2*n,row=1)
-            n += 1
-        Button(text='确认',command=lambda: self.get_data(root,data_from)).grid(column=3,row=2)
-        Button(text='取消',command=lambda: os._exit(0)).grid(column=5,row=2)
-        root.mainloop()
+
         
     def send(self,msg,INPUT:StringVar) -> None:
         if msg != '':
@@ -482,7 +464,8 @@ class Demo():
         self.custom_check.grid(column=2,row=2,sticky=W)
         Radiobutton(server_page,text='随机密码',variable=is_password,value='random_password').grid(column=1,row=3,sticky=W)
         
-        Label(server_page,text=f'网络：{self.get_wifi()}').grid(column=0,row=4,sticky=NW)
+        Label(server_page,text='网络：').grid(column=0,row=4,sticky=NW)
+        Label(server_page,text=self.get_wifi()).grid(column=1,row=4,sticky=NW)
         
         Button(server_page,text='创建',command=lambda:smain(self.password.get())).grid(column=0,row=9,columnspan=3,rowspan=4)
         
@@ -502,7 +485,8 @@ class Demo():
         cpassword.grid(column=1,row=1)
         self.cpassword = cpassword
         
-        Label(client_page,text=f'网络：{self.get_wifi()}').grid(column=0,row=2,sticky=NW)
+        Label(client_page,text='网络：').grid(column=0,row=2,sticky=NW)
+        Label(client_page,text=self.get_wifi()).grid(column=1,row=2,sticky=NW)
         
         Button(client_page,text='加入',command=lambda:cmain(self.cpassword.get(),cip.get())).grid(column=0,row=3,columnspan=3,rowspan=4)
         
