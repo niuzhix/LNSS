@@ -2,7 +2,7 @@
 @discription  : Copyright © 2021-2024 Blue Summer Studio. All rights reserved.
 @Author       : Niu zhixin
 @Date         : 2024-10-19 15:12:58
-@LastEditTime : 2024-12-19 16:06:24
+@LastEditTime : 2024-12-21 17:24:12
 @LastEditors  : Niu zhixin
 '''
 import json
@@ -28,7 +28,7 @@ server_iid = []
 server_expression_button = {}
 server_buttons = {}
 server_expression = list('😀😁😂🤣😃😄😅😆😉😊😋😎😍😘🥰😗😙🥲😚🙂🤗🤩🤔🫡🤨😐😑😶🫥🙄😏😣😥😮🤐😯😪😫🥱😴😌😛😜😝🤤😒😓😔😕🫤🙃🫠🤑😲🙁😖😞😟😤😢😭😦😧😨😩🤯')
-VERSION = 'v.0.5.3'
+VERSION = 'v.2.0.2 beta 1.1'
 
 class server:
     def __init__(self,window:Tk|None=None) -> None:
@@ -283,7 +283,7 @@ class client():
         sends.place(x=5,y=310,width=545,height=170)
         sending = Button(root,text='发送',command=lambda:self.send(sends.get(),INPUT))
         sending.place(x=552,y=310)
-        expressions = Button(root,text='表情',command=lambda:self.expression())
+        expressions = Button(root,text='表情',command=lambda:self.expressions())
         expressions.place(x=552,y=335)
         menubar = Menu(root)
         root.config(menu=menubar)
@@ -298,12 +298,12 @@ class client():
             if event.keysym.upper() == 'A':
                 self.MenuHelp(self.window)
     
-    def expression(self):
-        global buttons,client_expression_button,expression_choose
+    def expressions(self):
+        global client_buttons,client_expression_button,expression_choose
         expression_choose = Toplevel(self.window)
         for i in range(11):
             for j in range(6):
-                button = Button(expression_choose,text=client_expression[(i-1)*6+j],command=lambda i=i,j=j:self.expressions(i,j),width=3)
+                button = Button(expression_choose,text=client_expression[(i-1)*6+j],command=lambda i=i,j=j:self.expression(i,j),width=3)
                 button.grid(column=i,row=j)
                 client_buttons[i,j] = button
                 client_expression_button[i,j] = client_expression[(i-1)*6+j]
@@ -346,6 +346,10 @@ class client():
             datas.append(str(data.get()))
         IP = '.'.join(datas)
         root.destroy()
+        
+    def expression(self,x,y) -> None:
+        global sends,INPUT
+        INPUT.set(sends.get()+client_expression_button[x,y])
 
         
     def send(self,msg,INPUT:StringVar) -> None:
