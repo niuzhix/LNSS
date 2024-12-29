@@ -170,7 +170,9 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
+# Pyinstaller logs
 build/
 dist/
 /main.spec
 /deprecated
+/.ipynb

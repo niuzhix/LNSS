@@ -1,26 +1,29 @@
 '''
 @discription  : Copyright © 2021-2024 Blue Summer Studio. All rights reserved.
 @Author       : Niu zhixin
-@Date         : 2024-10-19 15:12:58
-@LastEditTime : 2024-12-22 19:15:06
+@Date         : 2024-12-21 16:35:05
+@LastEditTime : 2024-12-28 16:21:15
 @LastEditors  : Niu zhixin
 '''
-import json
-import socket
-#// import logging
-# //import pystray
-import threading
-import time
-import secrets
-import os
+#!! Tkinter
 from tkinter import *
 from tkinter.scrolledtext import ScrolledText
 from tkinter.messagebox import askyesnocancel,showwarning
-from tkinter.filedialog import asksaveasfilename,askopenfilename
+from tkinter.filedialog import asksaveasfilename
 from tkinter.ttk import Treeview,Notebook,Button,Labelframe,Combobox,Style
-from typing import NoReturn
-from PIL import Image,ImageTk
+
+#!! Built In Libraries
 import re
+import os
+import json
+import time
+from typing import NoReturn
+
+#!! Third Party Libraries
+import socket
+import threading
+import secrets
+from PIL import Image,ImageTk
 
 server_users = [socket.gethostname()]
 server_conns = []
@@ -28,7 +31,7 @@ server_iid = []
 server_expression_button = {}
 server_buttons = {}
 server_expression = list('😀😁😂🤣😃😄😅😆😉😊😋😎😍😘🥰😗😙🥲😚🙂🤗🤩🤔🫡🤨😐😑😶🫥🙄😏😣😥😮🤐😯😪😫🥱😴😌😛😜😝🤤😒😓😔😕🫤🙃🫠🤑😲🙁😖😞😟😤😢😭😦😧😨😩🤯')
-VERSION = 'v.2.0.2 beta 1.1'
+VERSION = 'v.2.0.2 正式版'
 
 class server:
     def __init__(self,window:Tk|None=None) -> None:
@@ -51,7 +54,6 @@ class server:
         root.title('socket server')
         root.geometry('640x480')
         root.resizable(False,False)
-        print(type(Image_load.__load__(root,image_file=f'{os.getcwd()}\\Lib\\show.png')))
         root.iconphoto(False, Image_load.__load__(root,image_file=f'{os.getcwd()}\\Lib\\show.png'))
         receives = ScrolledText(root,background='#f2f2f2',cursor='arrow',wrap=WORD)
         receives.place(x=5,y=0,width=490,height=310)
@@ -87,7 +89,6 @@ class server:
     def __accept__(self) -> NoReturn:
         while True:
             try:
-                print('****')
                 result=socket_server.accept()
                 conn=result[0]
                 address=result[1]
@@ -106,12 +107,10 @@ class server:
                 break
     
     def check(self,conn:socket.socket) -> bool:
-        print(4444)
         conn.send(password.encode("UTF-8"))
         
         while True:
             re = conn.recv(1024).decode('utf-8')
-            print(re)
             if re == password:
                 return True
             elif re == 'error':
@@ -140,12 +139,10 @@ class server:
             pass
         
     def menu(self,item) -> None:
-        print(item)
         if str(item) == '显示':
             server_root.deiconify()
         elif str(item) == '退出':
             is_destroy = askyesnocancel('警告！','一但关闭程序，所有连接将断开（无法恢复！）')
-            print(is_destroy)
             if not is_destroy is None:
                 if is_destroy:
                     threading.Thread(target=icon.stop,daemon=True).start()
@@ -182,12 +179,9 @@ class server:
                 receives.insert(END,'\n')
                 receives.see(END)
                 receives.update()
-                print(data)
                 self.send_all(user,conn,data)
             except:
                 delete = server_conns.count(conn)
-                print(delete)
-                print(server_users)
                 receives.insert(END,'[系统提示]'+server_users[delete]+'退出群聊！','system')
                 receives.insert(END,'\n')
                 server_conns.pop(delete-1)
@@ -227,14 +221,10 @@ class Image_load:
 
 def smain(password_type):
     global server_root, main, icon, password
-    if password_type == 'no_password':
-        password = 'no_password'
-    elif password_type == 'random_password':
+    if password_type == 'random_password':
         password = secrets.token_urlsafe(6)
     else:
         password = password_type
-    print(password)
-    print(os.getcwd())
     #// logging.basicConfig(filename=f'{os.getcwd()}\\information\\_configure\\{Decimal(time.time()).quantize(Decimal("1."),rounding=ROUND_HALF_UP)}.log',level=logging.INFO,format='%(asctime)s %(levelname)s %(message)s',datefmt = '%Y-%m-%d %H:%M:%S')
     #// logging.info('Lancher starts.')
     server_root = Toplevel()
@@ -316,12 +306,10 @@ class client():
             pass
     
     def menu(item) -> None:
-        print(item)
         if str(item) == '显示':
             client_root.deiconify()
         elif str(item) == '退出':
             is_destroy = askyesnocancel('警告！','一但关闭程序，所有连接将断开（无法恢复！）')
-            print(is_destroy)
             if not is_destroy is None:
                 if is_destroy:
                     threading.Thread(target=icon.stop,daemon=True).start()
@@ -368,11 +356,9 @@ class client():
                 data = socket_client.recv(1024).decode("UTF-8")
                 if data[0:6]=='[系统提示]':
                     if data[6:18] == 'user_append:':
-                        print('APPEND')
                         client_users.append(data[17:])
                         member.insert('',END,values=data[17:])
                     elif data[6:18] == 'user_delete:':
-                        print('DELETE')
                         delete = client_users.count(data[17:])
                         member.delete(delete)
                         client_users.pop(delete)
@@ -384,7 +370,6 @@ class client():
                     else:
                         receives.insert(END,data,'system')
                         receives.insert(END,'\n')
-                        print('SYSTEM')
                         receives.see(END)
                 else:
                     receives.insert(END,data,'others')
@@ -398,8 +383,6 @@ def cmain(passwords,ips):
     socket_client = socket.socket(family=socket.AF_INET,type=socket.SOCK_STREAM)
     socket_client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     socket_client.connect((ips,30247))
-    print(1)
-    print(passwords)
     #// while True:
     #//     ask = Tk()
     #//     askIP(ask)
@@ -413,19 +396,12 @@ def cmain(passwords,ips):
 
     check = False
     password = socket_client.recv(1024).decode('utf-8')
-    print(2)
-    print(password)
-    if password != 'no_password':
-        if passwords == password:
-            check = True
-    else:
+    if passwords == password:
         check = True
-        print(check)
     if check:
         socket_client.send(password.encode('utf-8'))
         socket_client.send(socket.gethostname().encode('utf-8'))
         client_users = json.loads(socket_client.recv(1024).decode('utf-8'))
-        print(client_users)
         client_root = Toplevel()
         main = client(client_root)
         main.__set__()
@@ -459,19 +435,18 @@ class Demo():
         Label(server_page,text='密码：').grid(column=0,row=0,sticky=NW)
         is_password = StringVar(value='random_password')
         self.is_password = is_password
-        Radiobutton(server_page,text='无密码',variable=is_password,value='no_password').grid(column=1,row=0,sticky=W)
-        Radiobutton(server_page,text='自定义密码',variable=is_password,value='custom_password').grid(column=1,row=1)
+        Radiobutton(server_page,text='自定义密码',variable=is_password,value='custom_password').grid(column=1,row=0)
         password = Entry(server_page,validate='focus',validatecommand=self.check_password)
-        password.grid(column=2,row=1)
+        password.grid(column=2,row=0)
         self.password = password
         self.custom_check = Label(server_page,fg='grey',font=("TkDefaultFont",8),text='',foreground='red',compound=LEFT)
-        self.custom_check.grid(column=2,row=2,sticky=W)
-        Radiobutton(server_page,text='随机密码',variable=is_password,value='random_password').grid(column=1,row=3,sticky=W)
+        self.custom_check.grid(column=2,row=1,sticky=W)
+        Radiobutton(server_page,text='随机密码',variable=is_password,value='random_password').grid(column=1,row=2,sticky=W)
         
-        Label(server_page,text='网络：').grid(column=0,row=4,sticky=NW)
-        Label(server_page,text=self.get_wifi()).grid(column=1,row=4,sticky=NW)
+        Label(server_page,text='网络：').grid(column=0,row=3,sticky=NW)
+        Label(server_page,text=self.get_wifi()).grid(column=1,row=3,sticky=NW)
         
-        Button(server_page,text='创建',command=lambda:smain(self.password.get())).grid(column=0,row=9,columnspan=3,rowspan=4)
+        Button(server_page,text='创建',command=lambda:smain(self.password.get())).grid(column=0,row=4,columnspan=3)
         
         
         

@@ -1,0 +1,43 @@
+# UTF-8
+VSVersionInfo(
+  ffi=FixedFileInfo(
+    # filevers and prodvers should be always a tuple with four items: (1, 2, 3, 4)
+    # Set not needed items to zero 0.
+    filevers=(2, 0, 2, 0),
+    prodvers=(2, 0, 2, 0),
+    # Contains a bitmask that specifies the valid bits 'flags'r
+    mask=0x17,
+    # Contains a bitmask that specifies the Boolean attributes of the file.
+    flags=0x0,
+    # The operating system for which this file was designed.
+    # 0x4 - NT and there is no need to change it.
+    OS=0x4,
+    # The general type of file.
+    # 0x1 - the file is an application.
+    fileType=0x1,
+    # The function of the file.
+    # 0x0 - the function is not defined for this fileType
+    subtype=0x0,
+    # Creation date and time stamp.
+    date=(0, 0)
+    ),
+  kids=[
+    StringFileInfo(
+      [
+      StringTable(
+        '040904b0',
+        [StringStruct('CompanyName', 'Blue Summer Studio'),
+        StringStruct('FileDescription', 'Local Network Socket System'),
+        StringStruct('FileVersion', '2.0.2正式版'),
+        StringStruct('InternalName', 'LNSS_exe'),
+        StringStruct('LegalCopyright', 'Copyright 2025 Blue Summer Studio. All rights reserved.'),
+        StringStruct('OriginalFilename', 'LNSS.exe'),
+        StringStruct('ProductName', 'LNSS'),
+        StringStruct('ProductVersion', '2.0.2正式版'),
+        StringStruct('CompanyShortName', 'BSS'),
+        StringStruct('ProductShortName', 'LNSS'),
+        StringStruct('LastChange', 'ea14a87b8fcd0401899717c54b8e86a6353b05f0490d8ce0b6c2ad758e2d002a-refs/branch-heads/6668@{#1705}')])
+      ]), 
+    VarFileInfo([VarStruct('Translation', [2052, 1200])])
+  ]
+)
