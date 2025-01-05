@@ -2,7 +2,7 @@
 @discription  : Copyright © 2021-2024 Blue Summer Studio. All rights reserved.
 @Author       : Niu zhixin
 @Date         : 2024-12-21 16:35:05
-@LastEditTime : 2024-12-28 16:21:15
+@LastEditTime : 2025-01-05 18:36:50
 @LastEditors  : Niu zhixin
 '''
 #!! Tkinter
@@ -24,6 +24,10 @@ import socket
 import threading
 import secrets
 from PIL import Image,ImageTk
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+
+KEY = b'17c5cbaf518d792fd28ebf859f342bdb'
 
 server_users = [socket.gethostname()]
 server_conns = []
@@ -82,6 +86,9 @@ class server:
         about.add_command(label='关于...(A)',command=lambda:self.MenuHelp(root),accelerator='Ctrl+A',underline=6)
         about.add_command(label='帮助(H)',command=lambda:self.MenuHelp(root),accelerator='F1',underline=4)
         menubar.add_cascade(label='关于(A)',menu=about,underline=3)
+        save_as = Menu(menubar,tearoff=0)
+        save_as.add_command(label='保存对话(S)',command=lambda:self.save_as(),accelerator='Ctrl+S',underline=5)
+        menubar.add_cascade(label='更多(M)',menu=save_as,underline=3)
         root.bind('<Key>',lambda event:self.onkey(event))
         sends.bind('<Return>',lambda events:self.send(sends.get(),INPUT))
         
@@ -120,6 +127,8 @@ class server:
         if event.state in (4,6,12,14,36,38,44,46):
             if event.keysym.upper() == 'A':
                 self.MenuHelp(self.window)
+            if event.keysym.upper() == 'S':
+                self.save_as()
     
     def expressions(self):
         global server_buttons,server_expression_button,expression_choose
@@ -206,6 +215,35 @@ class server:
         about.iconphoto(False, PhotoImage(file=f'{os.getcwd()}\\Lib\\show.png'))
         Label(about, image=Image_load.__load__(master,f'{os.getcwd()}\\Lib\\show.png',(64,64))).place(x=20,y=40)
         Label(about, text='LNSS,版本 '+VERSION+'\n\n版权所有(c)2024', font=('华文新魏', 11), justify=LEFT).place(x=120,y=40)
+    
+    def save_as(self) -> None:
+        file = asksaveasfilename(filetypes=[('LNSS 聊天记录文件','*.lns')],defaultextension='.lns')
+        if file:
+            self.encrypt_file(file)
+    
+    def encrypt_file(self,output_file_path):
+        chunk_size = 4 * 16 # 16 KB
+        iv = os.urandom(16)
+        encrypted_chunk = b''
+        cipher = Cipher(algorithms.AES(KEY), modes.CFB(iv), backend=default_backend())
+        data = receives.get(0.0,END)
+        with open('temp.txt', 'wb') as infile:
+            infile.write(data.encode('gbk'))
+            
+        with open(output_file_path, 'wb') as outfile, open('temp.txt', 'rb+') as infile2:
+            outfile.write(iv)# 写入 IV 到输出文件
+            infile2.seek(0)
+            while True:
+                encryptor = cipher.encryptor()  # 在每个块的循环中重新创建 encryptor
+                chunk = infile2.read(chunk_size)
+                print(chunk)
+                if not chunk:
+                    break
+                encrypted_chunk = encryptor.update(chunk) + encrypted_chunk
+            
+            encrypted_chunk = encrypted_chunk + encryptor.finalize()
+                
+            outfile.write(encrypted_chunk)
 
 class Image_load:
     def __load__(master:Tk|None=None,image_file:str|bytes|None=None,size:tuple[int,int]|None=None) -> PhotoImage:
@@ -281,12 +319,18 @@ class client():
         about.add_command(label='关于...(A)',command=lambda:self.MenuHelp(root),accelerator='Ctrl+A',underline=6)
         about.add_command(label='帮助(H)',command=lambda:self.MenuHelp(root),accelerator='F1',underline=4)
         menubar.add_cascade(label='关于(A)',menu=about,underline=3)
+        save_as = Menu(menubar,tearoff=0)
+        save_as.add_command(label='保存对话(S)',command=lambda:self.save_as(),accelerator='Ctrl+S',underline=5)
+        menubar.add_cascade(label='更多(M)',menu=save_as,underline=3)
         root.bind('<Key>',lambda event:self.onkey(event))
+        sends.bind('<Return>',lambda events:self.send(sends.get(),INPUT))
     
     def onkey(self,event:Event) -> None:
         if event.state in (4,6,12,14,36,38,44,46):
             if event.keysym.upper() == 'A':
                 self.MenuHelp(self.window)
+            if event.keysym.upper() == 'S':
+                self.save_as()
     
     def expressions(self):
         global client_buttons,client_expression_button,expression_choose
@@ -377,6 +421,28 @@ class client():
                     receives.see(END)
             except:
                 break
+    
+    def save_as(self) -> None:
+        file = asksaveasfilename(filetypes=[('LNSS 聊天记录文件','*.lns')],defaultextension='.lns')
+        if file:
+            self.encrypt_file(file)
+    
+    def encrypt_file(self,output_file_path):
+        chunk_size = 16 * 1024  # 16 KB
+        iv = os.urandom(16)
+        cipher = Cipher(algorithms.AES(KEY), modes.CFB(iv), backend=default_backend())
+        infile = receives.get(0.0,END)
+
+        with open(output_file_path, 'wb') as outfile:
+            outfile.write(iv)  # 写入 IV 到输出文件
+            while True:
+                encryptor = cipher.encryptor()  # 在每个块的循环中重新创建 encryptor
+                chunk = infile.read(chunk_size)
+                if not chunk:
+                    break
+
+            encrypted_chunk = encryptor.update(chunk) + encryptor.finalize()
+            outfile.write(encrypted_chunk)
 
 def cmain(passwords,ips):
     global socket_client,client_root,icon
