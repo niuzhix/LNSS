@@ -2,7 +2,7 @@
 @discription  : Copyright © 2021-2024 Blue Summer Studio. All rights reserved.
 @Author       : Niu zhixin
 @Date         : 2024-12-21 16:35:05
-@LastEditTime : 2025-01-05 18:36:50
+@LastEditTime : 2025-01-12 15:04:04
 @LastEditors  : Niu zhixin
 '''
 #!! Tkinter
@@ -26,6 +26,7 @@ import secrets
 from PIL import Image,ImageTk
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+import concurrent.futures
 
 KEY = b'17c5cbaf518d792fd28ebf859f342bdb'
 
@@ -48,7 +49,7 @@ class server:
         if not window is None:
             self.window = window
     
-    def __set__(self) -> None:
+    def __set__(self,password) -> None:
         global receives,member,menubar,about,other,is_alt,settings_value,settings_option,style,font_size,sends,INPUT
         font_size = ('楷体',12)
         style = Style()
@@ -58,7 +59,7 @@ class server:
         root.title('socket server')
         root.geometry('640x480')
         root.resizable(False,False)
-        root.iconphoto(False, Image_load.__load__(root,image_file=f'{os.getcwd()}\\Lib\\show.png'))
+        root.iconphoto(False, Image_load.load(root,image_file=f'{os.getcwd()}\\Lib\\show.png'))
         receives = ScrolledText(root,background='#f2f2f2',cursor='arrow',wrap=WORD)
         receives.place(x=5,y=0,width=490,height=310)
         receives.tag_config('mine',foreground='#000000',background='#43a649',font=font_size)
@@ -66,6 +67,8 @@ class server:
         receives.tag_config('system',foreground='#ff0000',background='#ffff00',font=font_size)
         receives.tag_config('message',foreground='#000000',background='#ffffff',font=font_size)
         receives.insert(END,'请在客户端输入以下IP：'+ip_address,'system')
+        receives.insert(END,'\n')
+        receives.insert(END,'请在客户端输入以下令牌：'+password,'system')
         receives.insert(END,'\n')
         member = Treeview(root,show='headings',columns='NAME',style='LNSS.Treeview')
         member.place(x=495,y=0,width=145,height=310)
@@ -213,7 +216,7 @@ class server:
         about.geometry('300x160+350+200')
         about.resizable(False,False)
         about.iconphoto(False, PhotoImage(file=f'{os.getcwd()}\\Lib\\show.png'))
-        Label(about, image=Image_load.__load__(master,f'{os.getcwd()}\\Lib\\show.png',(64,64))).place(x=20,y=40)
+        Label(about, image=Image_load.load(master,f'{os.getcwd()}\\Lib\\show.png',(64,64))).place(x=20,y=40)
         Label(about, text='LNSS,版本 '+VERSION+'\n\n版权所有(c)2024', font=('华文新魏', 11), justify=LEFT).place(x=120,y=40)
     
     def save_as(self) -> None:
@@ -246,7 +249,7 @@ class server:
             outfile.write(encrypted_chunk)
 
 class Image_load:
-    def __load__(master:Tk|None=None,image_file:str|bytes|None=None,size:tuple[int,int]|None=None) -> PhotoImage:
+    def load(master:Tk|None=None,image_file:str|bytes|None=None,size:tuple[int,int]|None=None) -> PhotoImage:
         global img_load,img
         img_load = Image.open(image_file)
         if not size is None:
@@ -257,17 +260,37 @@ class Image_load:
         else:
             return img_load
 
-def smain(password_type):
+class Netfind:
+    def ip() -> list:
+        all_ip = []
+        os.popen('arp -d *','r')
+        ip3 = int(os.popen('ipconfig').read().split('无线局域网适配器 WLAN:')[1].split('默认网关')[1].split(': ')[1].split('.1\n')[0].split('192.168.')[1])
+        def scan(ip3:int,ip4:int):
+            os.popen(f'ping -n 1 192.168.{ip3}.{ip4}')
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=255) as executor:
+            futures = {executor.submit(scan, ip3,ip4): ip4 for ip4 in range(1,256)}
+
+        for line in (os.popen('arp -a').read().split('\n'))[4:-1]:
+            if f'192.168.{ip3}.' in line:
+                if '动态' in line:
+                    all_ip.append(f'192.168.{ip3}.'+line.split(f'192.168.{ip3}.')[1].split(' ')[0])
+        
+        return all_ip
+
+def smain(password_type,passwords):
     global server_root, main, icon, password
+    print(password_type)
     if password_type == 'random_password':
         password = secrets.token_urlsafe(6)
+        print(password)
     else:
-        password = password_type
+        password = passwords
     #// logging.basicConfig(filename=f'{os.getcwd()}\\information\\_configure\\{Decimal(time.time()).quantize(Decimal("1."),rounding=ROUND_HALF_UP)}.log',level=logging.INFO,format='%(asctime)s %(levelname)s %(message)s',datefmt = '%Y-%m-%d %H:%M:%S')
     #// logging.info('Lancher starts.')
     server_root = Toplevel()
     main = server(server_root)
-    main.__set__()
+    main.__set__(password)
     threading.Thread(target=main.__accept__).start()
     server_root.protocol('WM_DELETE_WINDOW',lambda:server.destroied(main,server_root))
     server_root.mainloop()
@@ -368,7 +391,7 @@ class client():
         about.geometry('300x160+350+200')
         about.resizable(False,False)
         about.iconphoto(False, PhotoImage(file=f'{os.getcwd()}\\data\\Lib\\show.png'))
-        Label(about, image=Image_load.__load__(master,f'{os.getcwd()}\\data\\Lib\\show.png',(64,64))).place(x=20,y=40)
+        Label(about, image=Image_load.load(master,f'{os.getcwd()}\\data\\Lib\\show.png',(64,64))).place(x=20,y=40)
         Label(about, text='LNSS,版本 '+VERSION+'\n\n版权所有(c)2024', font=('华文新魏', 11), justify=LEFT).place(x=120,y=40)
     
     def get_data(self,root:Tk,data_from:list) -> None:
@@ -428,21 +451,30 @@ class client():
             self.encrypt_file(file)
     
     def encrypt_file(self,output_file_path):
-        chunk_size = 16 * 1024  # 16 KB
+        chunk_size = 4 * 16 # 16 KB
         iv = os.urandom(16)
+        encrypted_chunk = b''
         cipher = Cipher(algorithms.AES(KEY), modes.CFB(iv), backend=default_backend())
-        infile = receives.get(0.0,END)
-
-        with open(output_file_path, 'wb') as outfile:
-            outfile.write(iv)  # 写入 IV 到输出文件
+        data = receives.get(0.0,END)
+        with open('temp.txt', 'wb') as infile:
+            infile.write(data.encode('gbk'))
+            
+        with open(output_file_path, 'wb') as outfile, open('temp.txt', 'rb+') as infile2:
+            outfile.write(iv)# 写入 IV 到输出文件
+            infile2.seek(0)
             while True:
                 encryptor = cipher.encryptor()  # 在每个块的循环中重新创建 encryptor
-                chunk = infile.read(chunk_size)
+                chunk = infile2.read(chunk_size)
+                print(chunk)
                 if not chunk:
                     break
-
-            encrypted_chunk = encryptor.update(chunk) + encryptor.finalize()
+                encrypted_chunk = encryptor.update(chunk) + encrypted_chunk
+            
+            encrypted_chunk = encrypted_chunk + encryptor.finalize()
+                
             outfile.write(encrypted_chunk)
+
+        os.remove('temp.txt')
 
 def cmain(passwords,ips):
     global socket_client,client_root,icon
@@ -498,21 +530,21 @@ class Demo():
         server_page = Frame(main_page)
         server_page.pack(fill=BOTH)
         
-        Label(server_page,text='密码：').grid(column=0,row=0,sticky=NW)
+        Label(server_page,text='令牌：').grid(column=0,row=0,sticky=NW)
         is_password = StringVar(value='random_password')
         self.is_password = is_password
-        Radiobutton(server_page,text='自定义密码',variable=is_password,value='custom_password').grid(column=1,row=0)
+        Radiobutton(server_page,text='自定义令牌',variable=is_password,value='custom_password').grid(column=1,row=0)
         password = Entry(server_page,validate='focus',validatecommand=self.check_password)
         password.grid(column=2,row=0)
         self.password = password
         self.custom_check = Label(server_page,fg='grey',font=("TkDefaultFont",8),text='',foreground='red',compound=LEFT)
         self.custom_check.grid(column=2,row=1,sticky=W)
-        Radiobutton(server_page,text='随机密码',variable=is_password,value='random_password').grid(column=1,row=2,sticky=W)
+        Radiobutton(server_page,text='随机令牌',variable=is_password,value='random_password').grid(column=1,row=2,sticky=W)
         
         Label(server_page,text='网络：').grid(column=0,row=3,sticky=NW)
         Label(server_page,text=self.get_wifi()).grid(column=1,row=3,sticky=NW)
         
-        Button(server_page,text='创建',command=lambda:smain(self.password.get())).grid(column=0,row=4,columnspan=3)
+        Button(server_page,text='创建',command=lambda:smain(self.is_password.get(),self.password.get())).grid(column=0,row=4,columnspan=3)
         
         
         
@@ -525,7 +557,7 @@ class Demo():
         cip = Entry(client_page,validate='focusout')
         cip.grid(column=1,row=0)
         
-        Label(client_page,text='密码：').grid(column=0,row=1,sticky=NW)
+        Label(client_page,text='令牌：').grid(column=0,row=1,sticky=NW)
         cpassword = Entry(client_page,validate='focusout',validatecommand=self.check_password)
         cpassword.grid(column=1,row=1)
         self.cpassword = cpassword
@@ -556,10 +588,10 @@ class Demo():
         text = self.password.get()
         ret = re.match(r'[a-zA-Z0-9_]{6,8}',text)
         if (not ret is None) and len(text) <= 8 and len(text) >=6:
-            self.custom_check.config(text='密码可用',foreground='green',image=Image_load.__load__(self.window,f'{os.getcwd()}\\Lib\\correct.png',(10,10)))
+            self.custom_check.config(text='令牌可用',foreground='green',image=Image_load.load(self.window,f'{os.getcwd()}\\Lib\\correct.png',(10,10)))
             return True
         else:
-            self.custom_check.config(text='密码不可用',foreground='red',image=Image_load.__load__(self.window,f'{os.getcwd()}\\Lib\\warning.png',(10,10)))
+            self.custom_check.config(text='令牌不可用',foreground='red',image=Image_load.load(self.window,f'{os.getcwd()}\\Lib\\warning.png',(10,10)))
             return False
     
     def check_int(self)  -> bool:
@@ -575,18 +607,6 @@ class Demo():
             return os.popen('netsh wlan show interfaces').read().split('SSID')[1].split(': ')[1].split('\n')[0]
         except:
             return str('无网络')
-
-class Image_load:
-    def __load__(master:Tk|None=None,image_file:str|bytes|None=None,size:tuple[int,int]|None=None) -> PhotoImage:
-        global img_load,img
-        img_load = Image.open(image_file)
-        if not size is None:
-            img_load.thumbnail(size)
-        if not master is None:
-            img = ImageTk.PhotoImage(img_load)
-            return img
-        else:
-            return img_load
 
 def main():
     server_root = Tk()

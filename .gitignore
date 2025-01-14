@@ -175,4 +175,4 @@ build/
 dist/
 /main.spec
 /deprecated
-/.ipynb
+/test.ipynb
