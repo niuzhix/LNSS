@@ -2,7 +2,7 @@
 @discription  : Copyright © 2021-2024 Blue Summer Studio. All rights reserved.
 @Author       : Niu zhixin
 @Date         : 2024-12-21 16:35:05
-@LastEditTime : 2025-01-12 15:04:04
+@LastEditTime : 2025-01-17 16:20:26
 @LastEditors  : Niu zhixin
 '''
 #!! Tkinter
@@ -18,6 +18,8 @@ import os
 import json
 import time
 from typing import NoReturn
+import sqlite3
+from configparser import ConfigParser
 
 #!! Third Party Libraries
 import socket
@@ -25,12 +27,18 @@ import threading
 import secrets
 from PIL import Image,ImageTk
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives.asymmetric import rsa,padding
+from cryptography.hazmat.primitives import serialization,hashes
+from cryptography.fernet import Fernet
 import concurrent.futures
 
-KEY = b'17c5cbaf518d792fd28ebf859f342bdb'
+KEY = b'H5njeRP8RXXy3SNNs_j7AyQWpTs87d_Moq5pcDoeXME='
+sql_conn = sqlite3.connect(r'.\Lib\user.db')
+cursor = sql_conn.cursor()
+USER = []
+LOGIN = ''
 
-server_users = [socket.gethostname()]
+server_users = []
 server_conns = []
 server_iid = []
 server_expression_button = {}
@@ -40,7 +48,7 @@ VERSION = 'v.2.0.2 正式版'
 
 class server:
     def __init__(self,window:Tk|None=None) -> None:
-        global socket_server, ip_address
+        global socket_server, ip_address ,server_users
         socket_server=socket.socket(family=socket.AF_INET,type=socket.SOCK_STREAM)
         socket_server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,True)
         ip_address = socket.gethostbyname(socket.gethostname())
@@ -48,6 +56,7 @@ class server:
         socket_server.listen(10)
         if not window is None:
             self.window = window
+        server_users.append(LOGIN)
     
     def __set__(self,password) -> None:
         global receives,member,menubar,about,other,is_alt,settings_value,settings_option,style,font_size,sends,INPUT
@@ -74,7 +83,7 @@ class server:
         member.place(x=495,y=0,width=145,height=310)
         member.column('NAME',width=145)
         member.heading('NAME',text='当前在线：')
-        member.insert('',END,values=socket.gethostname()+'\n')
+        member.insert('',END,values=LOGIN+'\n')
         INPUT = StringVar()
         INPUT.set('')
         sends = Entry(root,width=110,textvariable=INPUT)
@@ -220,33 +229,36 @@ class server:
         Label(about, text='LNSS,版本 '+VERSION+'\n\n版权所有(c)2024', font=('华文新魏', 11), justify=LEFT).place(x=120,y=40)
     
     def save_as(self) -> None:
-        file = asksaveasfilename(filetypes=[('LNSS 聊天记录文件','*.lns')],defaultextension='.lns')
+        file = asksaveasfilename(filetypes=[('LNSS 聊天记录文件','*.lns')],defaultextension='.lns',initialfile=time.strftime('%Y%m%d%H%M%S',time.localtime(time.time())))
         if file:
-            self.encrypt_file(file)
+            self.decrypt_file(file)
     
-    def encrypt_file(self,output_file_path):
-        chunk_size = 4 * 16 # 16 KB
-        iv = os.urandom(16)
-        encrypted_chunk = b''
-        cipher = Cipher(algorithms.AES(KEY), modes.CFB(iv), backend=default_backend())
+    def decrypt_file(self,output_file_path):
+        private_key = rsa.generate_private_key(
+            public_exponent=65537,
+            key_size=2048,
+            backend=default_backend()
+        )
+        public_key = private_key.public_key()
         data = receives.get(0.0,END)
-        with open('temp.txt', 'wb') as infile:
-            infile.write(data.encode('gbk'))
+        
+        with open(output_file_path, 'wb') as outfile:
+            outfile.write(Fernet(KEY).encrypt(private_key.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.TraditionalOpenSSL,
+                encryption_algorithm=serialization.NoEncryption()
+            )))#!! Write the private key to the output file
             
-        with open(output_file_path, 'wb') as outfile, open('temp.txt', 'rb+') as infile2:
-            outfile.write(iv)# 写入 IV 到输出文件
-            infile2.seek(0)
-            while True:
-                encryptor = cipher.encryptor()  # 在每个块的循环中重新创建 encryptor
-                chunk = infile2.read(chunk_size)
-                print(chunk)
-                if not chunk:
-                    break
-                encrypted_chunk = encryptor.update(chunk) + encrypted_chunk
+            outfile.write(b'\n')#!! Write a newline character to the output file
             
-            encrypted_chunk = encrypted_chunk + encryptor.finalize()
-                
-            outfile.write(encrypted_chunk)
+            outfile.write(public_key.encrypt(
+                data.encode('gb2312',errors='ignore'),
+                padding.OAEP(
+                    mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                    algorithm=hashes.SHA256(),
+                    label=None
+                )
+            ))#!! Write the encrypted data to the output file
 
 class Image_load:
     def load(master:Tk|None=None,image_file:str|bytes|None=None,size:tuple[int,int]|None=None) -> PhotoImage:
@@ -451,28 +463,28 @@ class client():
             self.encrypt_file(file)
     
     def encrypt_file(self,output_file_path):
-        chunk_size = 4 * 16 # 16 KB
-        iv = os.urandom(16)
-        encrypted_chunk = b''
-        cipher = Cipher(algorithms.AES(KEY), modes.CFB(iv), backend=default_backend())
+        private_key = rsa.generate_private_key(
+            public_exponent=65537,
+            key_size=2048,
+            backend=default_backend()
+        )
+        public_key = private_key.public_key()
         data = receives.get(0.0,END)
-        with open('temp.txt', 'wb') as infile:
-            infile.write(data.encode('gbk'))
-            
-        with open(output_file_path, 'wb') as outfile, open('temp.txt', 'rb+') as infile2:
-            outfile.write(iv)# 写入 IV 到输出文件
-            infile2.seek(0)
-            while True:
-                encryptor = cipher.encryptor()  # 在每个块的循环中重新创建 encryptor
-                chunk = infile2.read(chunk_size)
-                print(chunk)
-                if not chunk:
-                    break
-                encrypted_chunk = encryptor.update(chunk) + encrypted_chunk
-            
-            encrypted_chunk = encrypted_chunk + encryptor.finalize()
-                
-            outfile.write(encrypted_chunk)
+        with open(output_file_path, 'wb') as outfile:
+            outfile.write(Fernet(KEY).encrypt(private_key.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.TraditionalOpenSSL,
+                encryption_algorithm=serialization.NoEncryption()
+            )))#!! Write the private key to the output file
+            outfile.write(b'\n')#!! Write a newline character to the output file
+            outfile.write(public_key.encrypt(
+                data.encode('gb2312'),
+                padding.OAEP(
+                    mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                    algorithm=hashes.SHA256(),
+                    label=None
+                )
+            ))#!! Write the encrypted data to the output file
 
         os.remove('temp.txt')
 
@@ -508,6 +520,75 @@ def cmain(passwords,ips):
         client_root.mainloop()
 
 
+class Login:
+    def __init__(self,window:Tk|None=None) -> None:
+        if not window is None:
+            self.window = window
+
+    def __choose_user__(self) -> None:
+        self.window.withdraw()
+        self.login = Toplevel(self.window)
+        self.login.title('选择登入用户')
+        self.login.geometry('300x160+350+200')
+        self.login.resizable(False,False)
+        self.login.iconphoto(False, PhotoImage(file=f'{os.getcwd()}\\Lib\\show.png'))
+        Label(self.login, text='选择登入用户：', font=('楷体', 10)).place(x=20,y=20)
+        self.user = Combobox(self.login, values=USER, font=('楷体', 10))
+        self.user.current(0)
+        self.user.place(x=20,y=60,width=260)
+        # user_info =
+        Button(self.login, text='注册', command=lambda:self.sign_up(), width=10).place(x=20,y=100)
+        Button(self.login, text='确定', command=lambda:self.get_data(self.window,[self.user]), width=10).place(x=100,y=100)
+
+
+    def get_data(self,window:Tk|None=None,entry:list[Combobox]=[]) -> None:
+        global LOGIN
+        if not window is None:
+            self.window = window
+        if not entry is None:
+            self.entry = entry
+        LOGIN = self.entry[0].get()
+        print(LOGIN)
+        self.login.destroy()
+        main = Demo(server_root)
+        main.__set__()
+        self.window.deiconify()
+    
+    def sign_up(self) -> None:
+        self.login.withdraw()
+        self.sign = Toplevel(self.login)
+        self.sign.title('注册用户')
+        self.sign.geometry('300x160+350+200')
+        self.sign.resizable(False,False)
+        self.sign.iconphoto(False, PhotoImage(file=f'{os.getcwd()}\\Lib\\show.png'))
+        Label(self.sign, text='注册用户：', font=('楷体', 10)).place(x=20,y=20)
+        user = Entry(self.sign, font=('楷体', 10))
+        user.place(x=100,y=20,width=160)
+        is_admin = BooleanVar()
+        is_admin.set(False)
+        Checkbutton(self.sign, text='管理员', font=('楷体',10),variable=is_admin).place(x=20,y=60)
+        Button(self.sign, text='确定', command=lambda:self.get_sign_up_data(self.login,[user,is_admin]), width=10).place(x=80,y=100)
+    
+    def get_sign_up_data(self,window:Tk|None=None,entry:list[Entry|BooleanVar]=[]) -> None:
+        global USER
+        if not window is None:
+            self.swindow = window
+        if not entry is None:
+            self.entry = entry
+        if self.entry[1].get():
+            is_admin = True
+        else:
+            is_admin = False
+        sql = '''INSERT INTO user_info (name,id,create_time,is_admin) VALUES (?,?,?,?)'''
+        cursor.execute(sql,(self.entry[0].get(),int(secrets.token_hex(6),16),time.strftime('%Y%m%d%H%M%S',time.localtime(time.time())),is_admin))
+        USER = cursor.execute('SELECT * FROM user_info').fetchall()
+        self.user['values'] = USER
+        self.user.current(len(USER)-1)
+        self.user.update()
+        sql_conn.commit()
+        self.swindow.deiconify()
+        self.sign.destroy()
+
 
 class Demo():
     def __init__(self,window:Tk|None=None) -> None:
@@ -521,7 +602,13 @@ class Demo():
         root.title('socket client')
         root.resizable(False,False)
         root.iconphoto(False, PhotoImage(file=f'{os.getcwd()}\\Lib\\show.png'))
+        print(LOGIN)
         main_page = Notebook(root)
+        
+        
+        
+        
+        
         
         
         
@@ -571,8 +658,19 @@ class Demo():
         
         
         
+        welcome_page = Frame(main_page)
+        welcome_page.pack(fill=BOTH)
+        Label(welcome_page,text=f'你好，{LOGIN}!',font=('楷体',12),anchor=W).grid(column=0,row=0,sticky=W)
+        Label(welcome_page,text='欢迎使用 LNSS 聊天系统！',font=('楷体',10),anchor=W).grid(column=0,row=2,sticky=W)
+        Label(welcome_page,text='版本：'+VERSION,font=('楷体',10),anchor=W).grid(column=0,row=3,sticky=W)
+        Label(welcome_page,text='作者：牛 志鑫 & Blue Summer Studio',font=('楷体',10),anchor=W).grid(column=0,row=4,sticky=W)
+        Button(welcome_page,text='更多...',command=lambda:self.show_more()).grid(column=0,row=5,sticky=W)
+        
+        
+        
         main_page.add(server_page,text='服务端')
         main_page.add(client_page,text='客户端')
+        main_page.add(welcome_page,text='欢迎')
         main_page.pack(fill=BOTH)
         root.after(0,lambda:self.upload())
     
@@ -607,12 +705,70 @@ class Demo():
             return os.popen('netsh wlan show interfaces').read().split('SSID')[1].split(': ')[1].split('\n')[0]
         except:
             return str('无网络')
+    
+    def show_more(self) -> None:
+        with open(f'{os.getcwd()}\\LICENSES','r',encoding='utf-8') as f:
+            premits = f.read()
+        with open(f'{os.getcwd()}\\Lib\\intrpoduce.txt','r',encoding='utf-8') as f:
+            introduces = f.read()
+        more = Toplevel(self.window)
+        more.resizable(False,False)
+        more.geometry('600x320+350+200')
+        more.iconphoto(False, PhotoImage(file=f'{os.getcwd()}\\Lib\\show.png'))
+        more.title('更多信息')
+        main = Notebook(more)
+        
+        premit = Frame(main)
+        premit_scroll = Scrollbar(premit)
+        premit_show = Text(premit,font=('楷体',10),wrap=WORD,yscrollcommand=premit_scroll.set)
+        premit_scroll.config(command=premit_show.yview)
+        premit_show.insert(END,premits)
+        premit_show.config(state=DISABLED)
+        premit_show.pack(side=LEFT,fill=Y)
+        premit_scroll.pack(side=RIGHT,fill=Y)
+        
+        introduce = Frame(main)
+        introduce_scroll = Scrollbar(introduce)
+        introduce_show = Text(introduce,font=('楷体',10),wrap=WORD,yscrollcommand=introduce_scroll.set)
+        introduce_scroll.config(command=introduce_show.yview)
+        introduce_show.insert(END,introduces)
+        introduce_show.config(state=DISABLED)
+        introduce_show.pack(side=LEFT,fill=Y)
+        introduce_scroll.pack(side=RIGHT,fill=Y)
 
+        
+        premit.pack(fill=BOTH)
+        main.add(premit,text='许可证')  
+        introduce.pack(fill=BOTH)
+        main.add(introduce,text='介绍')
+        main.pack(fill=BOTH)
+
+def check_table() -> None:
+    sql = '''CREATE TABLE IF NOT EXISTS user_info (
+        name TEXT NOT NULL, 
+        id INTEGER PRIMARY KEY UNIQUE NOT NULL,
+        create_time NUMBER NOT NULL, 
+        last_login NUMBER, 
+        is_admin BOOLEAN
+        )'''
+    cursor.execute(sql)
+    sql = '''SELECT * FROM user_info WHERE is_admin = 1'''
+    cursor.execute(sql)
+    result = cursor.fetchall()
+    if result == []:
+        sql = '''INSERT INTO user_info (name,id,create_time,is_admin) VALUES (?,?,?,TRUE)'''
+        cursor.execute(sql,(socket.gethostname(),int(secrets.token_hex(6),16),time.strftime('%Y%m%d%H%M%S',time.localtime(time.time()))))
+        sql_conn.commit()
+    sql = '''SELECT * FROM user_info'''
+    cursor.execute(sql)
+    for i in cursor.fetchall():
+        USER.append(i[0])
+    
 def main():
+    global server_root
+    check_table()
     server_root = Tk()
-    main = Demo(server_root)
-    main.__set__()
-
+    Login(server_root).__choose_user__()
     server_root.mainloop()
 
 main()
