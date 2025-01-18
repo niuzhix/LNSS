@@ -1,0 +1,244 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-18 17:31+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: .\main.py:51
+msgid "v.2.0.3正式版"
+msgstr ""
+
+#: .\main.py:72
+msgid "socket server"
+msgstr ""
+
+#: .\main.py:82
+msgid "请在客户端输入以下IP："
+msgstr ""
+
+#: .\main.py:84
+msgid "请在客户端输入以下密码："
+msgstr ""
+
+#: .\main.py:89 .\main.py:345
+msgid "当前在线："
+msgstr ""
+
+#: .\main.py:95 .\main.py:352
+msgid "发送"
+msgstr ""
+
+#: .\main.py:97 .\main.py:354
+msgid "表情"
+msgstr ""
+
+#: .\main.py:102 .\main.py:359
+msgid "关于...(A)"
+msgstr ""
+
+#: .\main.py:103 .\main.py:360
+msgid "帮助(H)"
+msgstr ""
+
+#: .\main.py:104 .\main.py:361
+msgid "关于(A)"
+msgstr ""
+
+#: .\main.py:106 .\main.py:363
+msgid "保存对话(S)"
+msgstr ""
+
+#: .\main.py:107 .\main.py:364
+msgid "更多(M)"
+msgstr ""
+
+#: .\main.py:124 .\main.py:126
+#, python-format
+msgid "[系统提示]%s加入群聊！"
+msgstr ""
+
+#: .\main.py:127
+#, python-format
+msgid "[系统提示]user_append:%s"
+msgstr ""
+
+#: .\main.py:167
+msgid "显示"
+msgstr ""
+
+#: .\main.py:170 .\main.py:192 .\main.py:396 .\main.py:435
+msgid "警告！"
+msgstr ""
+
+#: .\main.py:170 .\main.py:396
+msgid "一但关闭程序，所有连接将断开（无法恢复！）"
+msgstr ""
+
+#: .\main.py:174 .\main.py:449
+msgid "[系统提示]服务器已关闭连接，即将退出程序！"
+msgstr ""
+
+#: .\main.py:192 .\main.py:435
+msgid "发布内容不能为空！"
+msgstr ""
+
+#: .\main.py:210 .\main.py:213
+#, python-format
+msgid "[系统提示]%s退出群聊！"
+msgstr ""
+
+#: .\main.py:214
+#, python-format
+msgid "[系统提示]user_delete:%s"
+msgstr ""
+
+#: .\main.py:228 .\main.py:407
+msgid "关于"
+msgstr ""
+
+#: .\main.py:233
+#, python-format
+msgid ""
+"版本 %s\n"
+"\n"
+"版权所有(c)2024"
+msgstr ""
+
+#: .\main.py:236 .\main.py:466
+msgid "聊天记录文件"
+msgstr ""
+
+#: .\main.py:412
+#, python-format
+msgid ""
+"版本 %s \n"
+"\n"
+"版权所有(c)2024"
+msgstr ""
+
+#: .\main.py:441
+msgid "[系统提示]"
+msgstr ""
+
+#: .\main.py:536
+msgid "选择登入用户"
+msgstr ""
+
+#: .\main.py:540
+msgid "选择登入用户："
+msgstr ""
+
+#: .\main.py:545
+msgid "注册"
+msgstr ""
+
+#: .\main.py:546 .\main.py:575
+msgid "确定"
+msgstr ""
+
+#: .\main.py:565
+msgid "注册用户"
+msgstr ""
+
+#: .\main.py:569
+msgid "注册用户："
+msgstr ""
+
+#: .\main.py:574
+msgid "管理员"
+msgstr ""
+
+#: .\main.py:625 .\main.py:652
+msgid "密码："
+msgstr ""
+
+#: .\main.py:628
+msgid "自定义密码"
+msgstr ""
+
+#: .\main.py:634
+msgid "随机密码"
+msgstr ""
+
+#: .\main.py:636 .\main.py:657
+msgid "网络："
+msgstr ""
+
+#: .\main.py:639
+msgid "创建"
+msgstr ""
+
+#: .\main.py:648
+msgid "主机地址："
+msgstr ""
+
+#: .\main.py:660
+msgid "加入"
+msgstr ""
+
+#: .\main.py:668
+#, python-format
+msgid "你好，%s!"
+msgstr ""
+
+#: .\main.py:669
+msgid "欢迎使用 LNSS 聊天系统！"
+msgstr ""
+
+#: .\main.py:670
+#, python-format
+msgid "版本：%s"
+msgstr ""
+
+#: .\main.py:671
+msgid "作者：牛 志鑫 & Blue Summer Studio"
+msgstr ""
+
+#: .\main.py:672
+msgid "更多..."
+msgstr ""
+
+#: .\main.py:676
+msgid "服务端"
+msgstr ""
+
+#: .\main.py:677
+msgid "客户端"
+msgstr ""
+
+#: .\main.py:678
+msgid "欢迎"
+msgstr ""
+
+#: .\main.py:694
+msgid "密码可用"
+msgstr ""
+
+#: .\main.py:697
+msgid "密码不可用"
+msgstr ""
+
+#: .\main.py:712
+msgid "无网络"
+msgstr ""
+
+#: .\main.py:721
+msgid "更多信息"
+msgstr ""
+
+#: .\main.py:735
+msgid "许可证"
+msgstr ""

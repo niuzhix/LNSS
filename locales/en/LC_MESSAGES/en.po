@@ -1,0 +1,244 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-18 17:04+0800\n"
+"PO-Revision-Date: 2025-01-18 17:05+0800\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.5\n"
+
+#: .\main.py:51
+msgid "v.2.0.3正式版"
+msgstr "v. 2.0.3 Official"
+
+#: .\main.py:72
+msgid "socket server"
+msgstr "socket server"
+
+#: .\main.py:82
+msgid "请在客户端输入以下IP："
+msgstr "Please enter the following IP address on the client:"
+
+#: .\main.py:84
+msgid "请在客户端输入以下密码："
+msgstr "Please enter the following password on the client:"
+
+#: .\main.py:89 .\main.py:345
+msgid "当前在线："
+msgstr "Currently online:"
+
+#: .\main.py:95 .\main.py:352
+msgid "发送"
+msgstr "Send"
+
+#: .\main.py:97 .\main.py:354
+msgid "表情"
+msgstr "Expression"
+
+#: .\main.py:102 .\main.py:359
+msgid "关于...(A)"
+msgstr "About...(A)"
+
+#: .\main.py:103 .\main.py:360
+msgid "帮助(H)"
+msgstr "Help(H)"
+
+#: .\main.py:104 .\main.py:361
+msgid "关于(A)"
+msgstr "About(A)"
+
+#: .\main.py:106 .\main.py:363
+msgid "保存对话(S)"
+msgstr "Save conversation (S)"
+
+#: .\main.py:107 .\main.py:364
+msgid "更多(M)"
+msgstr "More(M)"
+
+#: .\main.py:124 .\main.py:126
+#, python-format
+msgid "[系统提示]%s加入群聊！"
+msgstr "[System prompt]%s join the chat!"
+
+#: .\main.py:127
+#, python-format
+msgid "[系统提示]user_append:%s"
+msgstr "[System prompt]user_append:%s"
+
+#: .\main.py:167
+msgid "显示"
+msgstr "Show"
+
+#: .\main.py:170 .\main.py:192 .\main.py:396 .\main.py:435
+msgid "警告！"
+msgstr "Warning!"
+
+#: .\main.py:170 .\main.py:396
+msgid "一但关闭程序，所有连接将断开（无法恢复！）"
+msgstr "Once the program is closed, all connections will be disconnected (cannot be restored!)"
+
+#: .\main.py:174 .\main.py:449
+msgid "[系统提示]服务器已关闭连接，即将退出程序！"
+msgstr "[System prompt] The server has closed the connection and will soon exit the program!"
+
+#: .\main.py:192 .\main.py:435
+msgid "发布内容不能为空！"
+msgstr "The published content cannot be empty!"
+
+#: .\main.py:210 .\main.py:213
+#, python-format
+msgid "[系统提示]%s退出群聊！"
+msgstr "[System prompt] %s Exit group chat!"
+
+#: .\main.py:214
+#, python-format
+msgid "[系统提示]user_delete:%s"
+msgstr "[System prompt]user_delete:%s"
+
+#: .\main.py:228 .\main.py:407
+msgid "关于"
+msgstr "About"
+
+#: .\main.py:233 .\main.py:412
+#, python-format
+msgid ""
+"版本 %s\n"
+"\n"
+"版权所有(c)2024"
+msgstr ""
+"Version %s\n"
+"\n"
+"Copyright(c)2024"
+
+#: .\main.py:236 .\main.py:466
+msgid "聊天记录文件"
+msgstr "Chat Log File"
+
+#: .\main.py:412
+msgid "版本 "
+msgstr "Version "
+
+#: .\main.py:441
+msgid "[系统提示]"
+msgstr "[System ]"
+
+#: .\main.py:536
+msgid "选择登入用户"
+msgstr "Select login user"
+
+#: .\main.py:540
+msgid "选择登入用户："
+msgstr "Select login user:"
+
+#: .\main.py:545
+msgid "注册"
+msgstr "Sign In"
+
+#: .\main.py:546
+msgid "确定"
+msgstr "OK"
+
+#: .\main.py:565
+msgid "注册用户"
+msgstr "Register User"
+
+#: .\main.py:569
+msgid "注册用户："
+msgstr "Register User："
+
+#: .\main.py:574
+msgid "管理员"
+msgstr "Administrator"
+
+#: .\main.py:625 .\main.py:652
+msgid "密码："
+msgstr "Password:"
+
+#: .\main.py:628
+msgid "自定义密码"
+msgstr "Custom Password"
+
+#: .\main.py:634
+msgid "随机密码"
+msgstr "Ramdom Password"
+
+#: .\main.py:636 .\main.py:657
+msgid "网络："
+msgstr "Network:"
+
+#: .\main.py:639
+msgid "创建"
+msgstr "Create"
+
+#: .\main.py:648
+msgid "主机地址："
+msgstr "Host address:"
+
+#: .\main.py:660
+msgid "加入"
+msgstr "Join"
+
+#: .\main.py:668
+#, python-brace-format
+msgid "你好，%s!"
+msgstr "Hello,%s!"
+
+#: .\main.py:669
+msgid "欢迎使用 LNSS 聊天系统！"
+msgstr "Welcome to the LNSS chat system!"
+
+#: .\main.py:670
+#, python-brace-format
+msgid "版本：%s"
+msgstr "Version:%s"
+
+#: .\main.py:671
+msgid "作者：牛 志鑫 & Blue Summer Studio"
+msgstr "Author: Niu Zhixin & Blue Summer Studio"
+
+#: .\main.py:672
+msgid "更多..."
+msgstr "More..."
+
+#: .\main.py:676
+msgid "服务端"
+msgstr "Server"
+
+#: .\main.py:677
+msgid "客户端"
+msgstr "Client"
+
+#: .\main.py:678
+msgid "欢迎"
+msgstr "Welcome"
+
+#: .\main.py:694
+msgid "密码可用"
+msgstr "Password available"
+
+#: .\main.py:697
+msgid "密码不可用"
+msgstr "Password not available"
+
+#: .\main.py:712
+msgid "无网络"
+msgstr "Not Network"
+
+#: .\main.py:721
+msgid "更多信息"
+msgstr "More information"
+
+#: .\main.py:735
+msgid "许可证"
+msgstr "License"
