@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: .\main.py:51
-msgid "v.2.0.3正式版"
+msgid "v.2.0.3发布版"
 msgstr ""
 
 #: .\main.py:72
@@ -241,4 +241,20 @@ msgstr ""
 
 #: .\main.py:735
 msgid "许可证"
+msgstr ""
+
+#: .\main.py
+msgid "设置..."
+msgstr ""
+
+#: .\main.py
+msgid "设置"
+msgstr ""
+
+#: .\main.py
+msgid "语言"
+msgstr ""
+
+#: .\main.py
+msgid "应用"
 msgstr ""

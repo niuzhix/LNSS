@@ -36,7 +36,7 @@ VSVersionInfo(
         StringStruct('ProductVersion', '2.0.3 perview 2.0'),
         StringStruct('CompanyShortName', 'BSS'),
         StringStruct('ProductShortName', 'LNSS'),
-        StringStruct('LastChange', '3dcd8c23f393961d38d2872cbb9156419f45a34a')])
+        StringStruct('LastChange', '9fb15d38c70f07e456176ce0f7f380a6f7d85e91')])
       ]), 
     VarFileInfo([VarStruct('Translation', [2052, 1200])])
   ]

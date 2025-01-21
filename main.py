@@ -2,7 +2,7 @@
 @discription  : Copyright © 2021-2024 Blue Summer Studio. All rights reserved.
 @Author       : Niu zhixin
 @Date         : 2024-12-21 16:35:05
-@LastEditTime : 2025-01-18 17:38:01
+@LastEditTime : 2025-01-21 11:50:27
 @LastEditors  : Niu zhixin
 '''
 #!! Tkinter
@@ -20,7 +20,7 @@ import time
 from typing import NoReturn
 import sqlite3
 import gettext
-#// from configparser import ConfigParser
+from configparser import ConfigParser
 
 #!! Third Party Libraries
 import socket
@@ -33,13 +33,17 @@ from cryptography.hazmat.primitives import serialization,hashes
 from cryptography.fernet import Fernet
 import concurrent.futures
 
+LANGUAGE_LIST = ['简体中文','English']
 KEY = b'H5njeRP8RXXy3SNNs_j7AyQWpTs87d_Moq5pcDoeXME='
 sql_conn = sqlite3.connect(r'.\Lib\user.db')
 cursor = sql_conn.cursor()
 USER = []
 LOGIN = ''
-ENGLISH = False
-if ENGLISH:
+ini_cursor = ConfigParser()
+ini_cursor.read(f'{os.getcwd()}\\Lib\\config.ini',encoding='gb2312')
+print(ini_cursor.has_section('Settings'))
+LANG = ini_cursor.get('Settings','language')
+if LANG == 'English':
     lang = gettext.translation('en', localedir='locales', languages=['en'])
     lang.install()
     _ = lang.gettext
@@ -52,7 +56,7 @@ server_iid = []
 server_expression_button = {}
 server_buttons = {}
 server_expression = list('😀😁😂🤣😃😄😅😆😉😊😋😎😍😘🥰😗😙🥲😚🙂🤗🤩🤔🫡🤨😐😑😶🫥🙄😏😣😥😮🤐😯😪😫🥱😴😌😛😜😝🤤😒😓😔😕🫤🙃🫠🤑😲🙁😖😞😟😤😢😭😦😧😨😩🤯')
-VERSION = _('v.2.0.3正式版')
+VERSION = _('v.2.0.3发布版')
 
 class server:
     def __init__(self,window:Tk|None=None) -> None:
@@ -612,7 +616,7 @@ class Demo():
         root.resizable(False,False)
         root.iconphoto(False, PhotoImage(file=f'{os.getcwd()}\\Lib\\show.png'))
         print(LOGIN)
-        main_page = Notebook(root)
+        main_page = Notebook(root,padding='5 10 10 10')
         
         
         
@@ -624,7 +628,7 @@ class Demo():
         
         
         server_page = Frame(main_page)
-        server_page.pack(fill=BOTH)
+        server_page.grid(sticky=(N, S, W, E))
         
         Label(server_page,text=_('密码：')).grid(column=0,row=0,sticky=NW)
         is_password = StringVar(value='random_password')
@@ -647,7 +651,7 @@ class Demo():
         
         
         client_page = Frame(main_page)
-        client_page.pack(fill=BOTH)
+        client_page.grid(sticky=(N, S, W, E))
         
         Label(client_page,text=_('主机地址：')).grid(column=0,row=0,sticky=NW)
         cip = Entry(client_page,validate='focusout')
@@ -668,12 +672,13 @@ class Demo():
         
         
         welcome_page = Frame(main_page)
-        welcome_page.pack(fill=BOTH)
+        welcome_page.grid(sticky=(N, S, W, E))
         Label(welcome_page,text=_('你好，%s!')%LOGIN,font=('楷体',12),anchor=W).grid(column=0,row=0,sticky=W)
         Label(welcome_page,text=_('欢迎使用 LNSS 聊天系统！'),font=('楷体',10),anchor=W).grid(column=0,row=2,sticky=W)
         Label(welcome_page,text=_('版本：%s')%VERSION,font=('楷体',10),anchor=W).grid(column=0,row=3,sticky=W)
         Label(welcome_page,text=_('作者：牛 志鑫 & Blue Summer Studio'),font=('楷体',10),anchor=W).grid(column=0,row=4,sticky=W)
         Button(welcome_page,text=_('更多...'),command=lambda:self.show_more()).grid(column=0,row=5,sticky=W)
+        Button(welcome_page,text=_('设置...'),command=lambda:self.settings()).grid(column=1,row=5)
         
         
         
@@ -720,7 +725,7 @@ class Demo():
             premits = f.read()
         more = Toplevel(self.window)
         more.resizable(False,False)
-        more.geometry('600x320+350+200')
+        more.geometry('400x320+350+200')
         more.iconphoto(False, PhotoImage(file=f'{os.getcwd()}\\Lib\\show.png'))
         more.title(_('更多信息'))
         main = Notebook(more)
@@ -738,6 +743,33 @@ class Demo():
         premit.pack(fill=BOTH)
         main.add(premit,text=_('许可证'))  
         main.pack(fill=BOTH)
+    
+    def settings(self) -> None:
+        self.setting = Toplevel(self.window)
+        self.setting.resizable(False,False)
+        self.setting.geometry('365x410+350+200')
+        self.setting.title(_('设置'))
+        notebook = Notebook(self.setting,padding='5 10 10 10')
+        
+        language = Frame(notebook)
+        language_frame = LabelFrame(language,text=_('语言'),height=350)
+        language_frame.pack(fill=X,side=TOP)
+        self.language_famliy = Combobox(language_frame,width=30,height=8,values=LANGUAGE_LIST)
+        self.language_famliy.current(LANGUAGE_LIST.index(LANG))
+        self.language_famliy.grid(column=0,row=0)
+        
+        language.pack(fill=BOTH)
+        notebook.add(language,text=_('语言'))
+        notebook.pack(fill=BOTH,expand=1)
+        Button(self.setting,text=_('应用'),command=lambda:self.apply()).pack(side=RIGHT)
+    
+    def apply(self) -> None:
+        LANG = self.language_famliy.get()
+        ini_cursor.set('Settings','language',LANG)
+        with open(f'{os.getcwd()}\\Lib\\config.ini','w') as f:
+            ini_cursor.write(f)
+        self.setting.destroy()
+
 
 def check_table() -> None:
     sql = '''CREATE TABLE IF NOT EXISTS user_info (
