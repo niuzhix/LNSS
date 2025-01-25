@@ -258,3 +258,15 @@ msgstr ""
 #: .\main.py
 msgid "应用"
 msgstr ""
+
+#: .\main.py
+msgid "让我们开始吧！"
+msgstr ""
+
+#: .\main.py
+msgid "您的用户名是："
+msgstr ""
+
+#: .\main.py
+msgid "取消"
+msgstr ""

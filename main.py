@@ -2,7 +2,7 @@
 @discription  : Copyright © 2021-2024 Blue Summer Studio. All rights reserved.
 @Author       : Niu zhixin
 @Date         : 2024-12-21 16:35:05
-@LastEditTime : 2025-01-21 11:50:27
+@LastEditTime : 2025-01-25 16:51:53
 @LastEditors  : Niu zhixin
 '''
 #!! Tkinter
@@ -769,6 +769,27 @@ class Demo():
         with open(f'{os.getcwd()}\\Lib\\config.ini','w') as f:
             ini_cursor.write(f)
         self.setting.destroy()
+    
+def sign_up() -> None:
+    sign = Tk()
+    sign.title(_('注册'))
+    sign.geometry('400x160+350+200')
+    sign.resizable(False,False)
+    sign.iconphoto(False, PhotoImage(file=f'{os.getcwd()}\\Lib\\show.png'))
+    sign.protocol('WM_DELETE_WINDOW',lambda:os._exit(0))
+    Label(sign,text=_('让我们开始吧！'),font=('楷体',12)).place(x=20,y=20)
+    Label(sign,text=_('您的用户名是：'),font=('楷体',10)).place(x=20,y=60)
+    user = Entry(sign,font=('楷体',10))
+    user.place(x=160,y=60)
+    Button(sign,text=_('确定'),command=lambda:sign_up_data(sign,user)).place(x=20,y=100)
+    Button(sign,text=_('取消'),command=lambda:os._exit(0)).place(x=120,y=100)
+    sign.mainloop()
+
+def sign_up_data(master:Tk,user:Entry) -> None:
+    sql = '''INSERT INTO user_info (name,id,create_time,is_admin) VALUES (?,?,?,TRUE)'''
+    cursor.execute(sql,(user.get(),int(secrets.token_hex(6),16),time.strftime('%Y%m%d%H%M%S',time.localtime(time.time()))))
+    sql_conn.commit()
+    master.destroy()
 
 
 def check_table() -> None:
@@ -780,13 +801,11 @@ def check_table() -> None:
         is_admin BOOLEAN
         )'''
     cursor.execute(sql)
-    sql = '''SELECT * FROM user_info WHERE is_admin = 1'''
-    cursor.execute(sql)
-    result = cursor.fetchall()
-    if result == []:
-        sql = '''INSERT INTO user_info (name,id,create_time,is_admin) VALUES (?,?,?,TRUE)'''
-        cursor.execute(sql,(socket.gethostname(),int(secrets.token_hex(6),16),time.strftime('%Y%m%d%H%M%S',time.localtime(time.time()))))
-        sql_conn.commit()
+    if ini_cursor.get('Users','is_first_run'):
+        sign_up()
+        ini_cursor.set('Users','is_first_run','False')
+        with open(f'{os.getcwd()}\\Lib\\config.ini','w') as f:
+            ini_cursor.write(f)
     sql = '''SELECT * FROM user_info'''
     cursor.execute(sql)
     for i in cursor.fetchall():
