@@ -270,3 +270,7 @@ msgstr ""
 #: .\main.py
 msgid "取消"
 msgstr ""
+
+#: .\main.py
+msgid "密码不符合规定,已自动切换为随机密码！"
+msgstr ""

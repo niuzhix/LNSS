@@ -2,7 +2,7 @@
 @discription  : Copyright © 2021-2024 Blue Summer Studio. All rights reserved.
 @Author       : Niu zhixin
 @Date         : 2024-12-21 16:35:05
-@LastEditTime : 2025-01-25 16:51:53
+@LastEditTime : 2025-01-26 13:51:53
 @LastEditors  : Niu zhixin
 '''
 #!! Tkinter
@@ -35,10 +35,13 @@ import concurrent.futures
 
 LANGUAGE_LIST = ['简体中文','English']
 KEY = b'H5njeRP8RXXy3SNNs_j7AyQWpTs87d_Moq5pcDoeXME='
+is_password_can_use = False
+
 sql_conn = sqlite3.connect(r'.\Lib\user.db')
 cursor = sql_conn.cursor()
 USER = []
 LOGIN = ''
+
 ini_cursor = ConfigParser()
 ini_cursor.read(f'{os.getcwd()}\\Lib\\config.ini',encoding='gb2312')
 print(ini_cursor.has_section('Settings'))
@@ -310,7 +313,11 @@ def smain(password_type,passwords):
         password = secrets.token_urlsafe(6)
         print(password)
     else:
-        password = passwords
+        if is_password_can_use:
+            password = passwords
+        else:
+            showwarning(_('警告'),_('密码不符合规定,已自动切换为随机密码！'))
+            password = secrets.token_urlsafe(6)
     #// logging.basicConfig(filename=f'{os.getcwd()}\\information\\_configure\\{Decimal(time.time()).quantize(Decimal("1."),rounding=ROUND_HALF_UP)}.log',level=logging.INFO,format='%(asctime)s %(levelname)s %(message)s',datefmt = '%Y-%m-%d %H:%M:%S')
     #// logging.info('Lancher starts.')
     server_root = Toplevel()
@@ -697,13 +704,16 @@ class Demo():
         self.window.after(100,lambda:self.upload())
     
     def check_password(self)  -> bool:
+        global is_password_can_use
         text = self.password.get()
         ret = re.match(r'[a-zA-Z0-9_]{6,8}',text)
         if (not ret is None) and len(text) <= 8 and len(text) >=6:
             self.custom_check.config(text=_('密码可用'),foreground='green',image=Image_load.load(self.window,f'{os.getcwd()}\\Lib\\correct.png',(10,10)))
+            is_password_can_use = True
             return True
         else:
             self.custom_check.config(text=_('密码不可用'),foreground='red',image=Image_load.load(self.window,f'{os.getcwd()}\\Lib\\warning.png',(10,10)))
+            is_password_can_use = False
             return False
     
     def check_int(self)  -> bool:
@@ -801,7 +811,7 @@ def check_table() -> None:
         is_admin BOOLEAN
         )'''
     cursor.execute(sql)
-    if ini_cursor.get('Users','is_first_run'):
+    if ini_cursor.get('Users','is_first_run') == 'True':
         sign_up()
         ini_cursor.set('Users','is_first_run','False')
         with open(f'{os.getcwd()}\\Lib\\config.ini','w') as f:
