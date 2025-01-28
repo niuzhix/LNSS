@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LNSS 聊天系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            font-family: '微软雅黑', Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        header {
+            background: #333;
+            color: #fff;
+            padding-top: 30px;
+            min-height: 70px;
+            border-bottom: #54a7ff 3px solid;
+        }
+        header a {
+            color: #fff;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 16px;
+        }
+        header ul {
+            padding: 0;
+            list-style: none;
+        }
+        header li {
+            display: inline;
+            padding: 0 20px 0 20px;
+        }
+        header #branding {
+            float: left;
+        }
+        header #branding h1 {
+            margin: 0;
+        }
+        header nav {
+            float: right;
+            margin-top: 10px;
+        }
+        header .highlight, header .current a {
+            color: #54a7ff;
+            font-weight: bold;
+        }
+        header a:hover {
+            color: #ffffff;
+            font-weight: bold;
+        }
+        .content {
+            padding: 20px;
+            background: #fff;
+            margin-top: 20px;
+        }
+        .footer {
+            background: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+        .footer a {
+            color: #54a7ff;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            color: #ffffff;
+        }
+        .btn {
+            display: inline-block;
+            color: #fff;
+            background: #54a7ff;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .btn:hover {
+            background: #333;
+        }
+        .fa {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div id="branding">
+                <h1><i class="fas fa-comments"></i> LNSS 聊天系统</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li class="current"><a href="#home">首页</a></li>
+                    <li><a href="#features">功能</a></li>
+                    <li><a href="#download">下载</a></li>
+                    <li><a href="#contact">联系我们</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <section id="home" class="content">
+            <h2>欢迎使用 LNSS 聊天系统</h2>
+            <p>LNSS 是一款基于 Python 编写的多用户聊天系统，支持服务端和客户端模式。用户可以通过服务端创建聊天室，客户端连接到服务端进行实时聊天。系统支持多种功能，如表情符号、消息加密、用户管理等。</p>
+            <a href="#features" class="btn">了解更多</a>
+        </section>
+
+        <section id="features" class="content">
+            <h2>功能介绍</h2>
+            <ul>
+                <li><i class="fas fa-server"></i> 支持服务端和客户端模式</li>
+                <li><i class="fas fa-comment"></i> 实时聊天功能</li>
+                <li><i class="fas fa-smile"></i> 表情符号支持</li>
+                <li><i class="fas fa-lock"></i> 消息加密</li>
+                <li><i class="fas fa-users"></i> 用户管理</li>
+                <li><i class="fas fa-save"></i> 聊天记录保存</li>
+            </ul>
+        </section>
+
+        <section id="download" class="content">
+            <h2>下载</h2>
+            <p>您可以从以下链接下载 LNSS 聊天系统：</p>
+            <a href="https://github.com/" target="_blank" class="btn">下载 LNSS 聊天系统</a>
+        </section>
+
+        <section id="contact" class="content">
+            <h2>联系我们</h2>
+            <p>如果您有任何问题或建议，请通过以下方式联系我们：</p>
+            <ul>
+                <li>联系电话：181 6883 6876</li>
+            </ul>
+        </section>
+    </div>
+
+    <footer class="footer">
+        <p>版权所有 © 2021-2025 Blue Summer Studio. All rights reserved.</p>
+    </footer>
+
+    <div>
+        <p>
+            <br><br><br>
+        </p>
+    </div>
+</body>
+</html>

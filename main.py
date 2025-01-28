@@ -1,5 +1,5 @@
 '''
-@discription  : Copyright © 2021-2024 Blue Summer Studio. All rights reserved.
+@discription  : Copyright © 2021-2025 Blue Summer Studio. All rights reserved.
 @Author       : Niu zhixin
 @Date         : 2024-12-21 16:35:05
 @LastEditTime : 2025-01-26 13:51:53
