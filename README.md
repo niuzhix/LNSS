@@ -2,7 +2,7 @@
  * @discription  : Copyright © 2021-2025 Blue Summer Studio. All rights reserved.
  * @Author       : Niu zhixin
  * @Date         : 2025-02-01 16:23:13
- * @LastEditTime : 2025-02-01 16:29:27
+ * @LastEditTime : 2025-02-02 15:08:22
  * @LastEditors  : Niu zhixin
 -->
 
@@ -20,7 +20,7 @@
 The LNSS (Local Network Socket Server) Chat System is a LAN-based chat application built with Python and Tkinter. It allows users to create and join chat servers within a local network, enabling real-time message exchange. The system supports multi-user chat, emoji sending, chat history saving, and more.
 
 ## Starting the Program 🚀
-To start the LNSS Chat System, run the `main.py` file. Upon launching, you will see a user selection interface.
+To start the LNSS Chat System, run the `LNSS.exe` file. Upon launching, you will see a user selection interface.
 
 ## User Registration and Login 🔑
 When you run the program for the first time, the system will prompt you to register an admin user. After registration, you can select the registered user from the user selection interface to log in.
@@ -137,7 +137,7 @@ By following this user guide, you should be able to quickly get started with the
 LNSS（本地网络套接字服务器）聊天系统是一个基于Python和Tkinter的局域网聊天应用程序。它允许用户在局域网内创建和加入聊天服务器，实现实时消息传递。该系统支持多用户聊天、表情发送、聊天记录保存等功能。
 
 ## 启动程序 🚀
-要启动LNSS聊天系统，请运行`main.py`文件。启动后，您将看到一个用户选择界面。
+要启动LNSS聊天系统，请运行`LNSS.exe`文件。启动后，您将看到一个用户选择界面。
 
 ## 用户注册和登录 🔑
 首次运行程序时，系统会提示您注册一个管理员用户。注册完成后，您可以在用户选择界面选择已注册的用户进行登录。
