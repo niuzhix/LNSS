@@ -33,10 +33,12 @@ from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.fernet import Fernet
 import concurrent.futures
+from plyer import notification
 
 LANGUAGE_LIST = ["简体中文", "English"]
 KEY = b"H5njeRP8RXXy3SNNs_j7AyQWpTs87d_Moq5pcDoeXME="
 is_password_can_use = False
+connected = False
 
 sql_conn = sqlite3.connect(r".\Lib\user.db")
 cursor = sql_conn.cursor()
@@ -56,6 +58,9 @@ else:
         return message
 
 
+VERSION = _("v2.0.4 正式版")
+
+
 server_users = []
 server_conns = []
 server_iid = []
@@ -64,7 +69,6 @@ server_buttons = {}
 server_expression = list(
     "😀😁😂🤣😃😄😅😆😉😊😋😎😍😘🥰😗😙🥲😚🙂🤗🤩🤔🫡🤨😐😑😶🫥🙄😏😣😥😮🤐😯😪😫🥱😴😌😛😜😝🤤😒😓😔😕🫤🙃🫠🤑😲🙁😖😞😟😤😢😭😦😧😨😩🤯"
 )
-VERSION = _("v2.0.4 正式版")
 
 
 class server:
@@ -168,6 +172,12 @@ class server:
                         END, _("[系统提示]%s加入群聊！") % user_name, "system"
                     )
                     receives.insert(END, "\n")
+                    receives.see(END)
+                    notification.notify(
+                        title="LNSS",
+                        message=_("[系统提示]%s加入群聊！") % user_name,
+                        timeout=2,
+                    )
                     self.send_all(
                         server_conns, None, _("[系统提示]%s加入群聊！") % user_name
                     )
@@ -213,33 +223,14 @@ class server:
                 server_expression_button[i, j] = server_expression[(i - 1) * 6 + j]
 
     def destroied(self, master: Tk) -> None:
-        master.withdraw()
-        try:
-            expression_choose.withdraw()
-        except:
-            pass
-
-    def menu(self, item) -> None:
-        if str(item) == _("显示"):
-            server_root.deiconify()
-        elif str(item) == "退出":
-            is_destroy = askyesnocancel(
-                _("警告！"), _("一但关闭程序，所有连接将断开（无法恢复！）")
-            )
-            if not is_destroy is None:
-                if is_destroy:
-                    threading.Thread(target=icon.stop, daemon=True).start()
-                    self.send_all(
-                        server_conns,
-                        None,
-                        _("[系统提示]服务器已关闭连接，即将退出程序！"),
-                    )
-                    for conn in server_conns:
-                        conn.close()
-                    socket_server.close()
-                    server_root.quit()
-                    server_root.destroy()
-                    icon.stop()
+        global server_conns
+        for conn in server_conns:
+            conn.send(_("[系统提示]服务器已关闭连接，即将退出程序！").encode("UTF-8"))
+        time.sleep(1)
+        for conn in server_conns:
+            conn.close()
+        master.quit()
+        master.destroy()
 
     def send(self, msg, INPUT: StringVar | None = None) -> None:
         if msg != "":
@@ -249,6 +240,7 @@ class server:
             receives.insert(END, socket.gethostname() + ":", "mine")
             receives.insert(END, msg, "message")
             receives.insert(END, "\n")
+            notification.notify(title="LNSS", message=msg, timeout=2)
             receives.see(END)
             receives.update()
         else:
@@ -265,6 +257,7 @@ class server:
                 data = conn.recv(1024).decode("UTF-8")
                 receives.insert(END, data, "others")
                 receives.insert(END, "\n")
+                notification.notify(title="LNSS", message=data, timeout=2)
                 receives.see(END)
                 receives.update()
                 self.send_all(user, conn, data)
@@ -274,6 +267,12 @@ class server:
                     END, _("[系统提示]%s退出群聊！") % server_users[delete], "system"
                 )
                 receives.insert(END, "\n")
+                receives.see(END)
+                notification.notify(
+                    title="LNSS",
+                    message=_("[系统提示]%s退出群聊！") % server_users[delete],
+                    timeout=2,
+                )
                 server_conns.pop(delete - 1)
                 self.send_all(
                     server_conns,
@@ -404,6 +403,13 @@ class Netfind:
 
 
 def smain(password_type, passwords):
+    global connected
+    if connected:
+        showwarning(_("警告！"), _("在一个程序中只能运行一个服务端/客户端！"))
+        return
+    else:
+        connected = True
+
     global server_root, main, icon, password
     if password_type == "random_password":
         password = secrets.token_urlsafe(6)
@@ -411,7 +417,7 @@ def smain(password_type, passwords):
         if is_password_can_use:
             password = passwords
         else:
-            showwarning(_("警告"), _("密码不符合规定,已自动切换为随机密码！"))
+            showwarning(_("警告！"), _("密码不符合规定,已自动切换为随机密码！"))
             password = secrets.token_urlsafe(6)
     # // logging.basicConfig(filename=f'{os.getcwd()}\\information\\_configure\\{Decimal(time.time()).quantize(Decimal("1."),rounding=ROUND_HALF_UP)}.log',level=logging.INFO,format='%(asctime)s %(levelname)s %(message)s',datefmt = '%Y-%m-%d %H:%M:%S')
     # // logging.info('Lancher starts.')
@@ -529,26 +535,9 @@ class client:
                 client_expression_button[i, j] = client_expression[(i - 1) * 6 + j]
 
     def destroied(self, master: Tk) -> None:
-        master.withdraw()
-        try:
-            expression_choose.withdraw()
-        except:
-            pass
-
-    def menu(item) -> None:
-        if str(item) == "显示":
-            client_root.deiconify()
-        elif str(item) == "退出":
-            is_destroy = askyesnocancel(
-                _("警告！"), _("一但关闭程序，所有连接将断开（无法恢复！）")
-            )
-            if not is_destroy is None:
-                if is_destroy:
-                    threading.Thread(target=icon.stop, daemon=True).start()
-                    socket_client.close()
-                    client_root.quit()
-                    client_root.destroy()
-                    icon.stop()
+        socket_client.close()
+        master.quit()
+        master.destroy()
 
     def Menuhelp(master: Tk) -> None:
         about = Toplevel(master)
@@ -588,6 +577,8 @@ class client:
             receives.insert(END, socket.gethostname() + ":", "mine")
             receives.insert(END, msg, "message")
             receives.insert(END, "\n")
+            receives.see(END)
+            notification.notify(title="LNSS", message=msg, timeout=2)
         else:
             showwarning(_("警告！"), _("发布内容不能为空！"))
 
@@ -612,10 +603,12 @@ class client:
                         receives.insert(END, data, "system")
                         receives.insert(END, "\n")
                         receives.see(END)
+                        notification.notify(title="LNSS", message=data, timeout=2)
                 else:
                     receives.insert(END, data, "others")
                     receives.insert(END, "\n")
                     receives.see(END)
+                    notification.notify(title="LNSS", message=data, timeout=2)
             except:
                 break
 
@@ -658,6 +651,13 @@ class client:
 
 
 def cmain(passwords, ips):
+    global connected
+    if connected:
+        showwarning(_("警告！"), _("在一个程序中只能运行一个服务端/客户端！"))
+        return
+    else:
+        connected = True
+
     global socket_client, client_root, icon
     socket_client = socket.socket(family=socket.AF_INET, type=socket.SOCK_STREAM)
     socket_client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
