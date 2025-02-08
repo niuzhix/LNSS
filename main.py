@@ -94,7 +94,7 @@ class server:
         root.geometry("640x480")
         root.resizable(False, False)
         root.iconphoto(
-            False, Image_load.load(root, image_file=f"{os.getcwd()}\\Lib\\show.png")
+            False, Image_load.load(root, image_file=f"{os.getcwd()}\\Lib\\LNSS.png")
         )
         receives = ScrolledText(root, background="#f2f2f2", cursor="arrow", wrap=WORD)
         receives.place(x=5, y=0, width=490, height=310)
@@ -236,11 +236,11 @@ class server:
         if msg != "":
             INPUT.set("")
             for conn in server_conns:
-                conn.send((socket.gethostname() + ":" + msg).encode("UTF-8"))
-            receives.insert(END, socket.gethostname() + ":", "mine")
+                conn.send((LOGIN + ":" + msg).encode("UTF-8"))
+            receives.insert(END, LOGIN + ":", "mine")
             receives.insert(END, msg, "message")
             receives.insert(END, "\n")
-            notification.notify(title="LNSS", message=msg, timeout=2)
+            notification.notify(title="LNSS", message=LOGIN + ":" + msg, timeout=2)
             receives.see(END)
             receives.update()
         else:
@@ -300,10 +300,10 @@ class server:
         about.title(_("关于"))
         about.geometry("300x160+350+200")
         about.resizable(False, False)
-        about.iconphoto(False, PhotoImage(file=f"{os.getcwd()}\\Lib\\show.png"))
+        about.iconphoto(False, PhotoImage(file=f"{os.getcwd()}\\Lib\\LNSS.png"))
         Label(
             about,
-            image=Image_load.load(master, f"{os.getcwd()}\\Lib\\show.png", (64, 64)),
+            image=Image_load.load(master, f"{os.getcwd()}\\Lib\\LNSS128.png", (64, 64)),
         ).place(x=20, y=40)
         Label(
             about,
@@ -453,7 +453,7 @@ class client:
         root.geometry("640x480")
         root.title("socket client")
         root.resizable(False, False)
-        root.iconphoto(False, PhotoImage(file=f"{os.getcwd()}\\Lib\\show.png"))
+        root.iconphoto(False, PhotoImage(file=f"{os.getcwd()}\\Lib\\LNSS.png"))
         receives = ScrolledText(root, background="#f2f2f2", cursor="arrow", wrap=WORD)
         receives.place(x=5, y=0, width=490, height=310)
         receives.tag_config(
@@ -544,11 +544,11 @@ class client:
         about.title(_("关于"))
         about.geometry("300x160+350+200")
         about.resizable(False, False)
-        about.iconphoto(False, PhotoImage(file=f"{os.getcwd()}\\data\\Lib\\show.png"))
+        about.iconphoto(False, PhotoImage(file=f"{os.getcwd()}\\data\\Lib\\LNSS.png"))
         Label(
             about,
             image=Image_load.load(
-                master, f"{os.getcwd()}\\data\\Lib\\show.png", (64, 64)
+                master, f"{os.getcwd()}\\data\\Lib\\LNSS128.png", (64, 64)
             ),
         ).place(x=20, y=40)
         Label(
@@ -572,13 +572,13 @@ class client:
 
     def send(self, msg, INPUT: StringVar) -> None:
         if msg != "":
-            socket_client.send((socket.gethostname() + ":" + msg).encode("UTF-8"))
+            socket_client.send((LOGIN + ":" + msg).encode("UTF-8"))
             INPUT.set("")
-            receives.insert(END, socket.gethostname() + ":", "mine")
+            receives.insert(END, LOGIN + ":", "mine")
             receives.insert(END, msg, "message")
             receives.insert(END, "\n")
             receives.see(END)
-            notification.notify(title="LNSS", message=msg, timeout=2)
+            notification.notify(title="LNSS", message=LOGIN + ":" + msg, timeout=2)
         else:
             showwarning(_("警告！"), _("发布内容不能为空！"))
 
@@ -700,7 +700,7 @@ class Login:
         self.login.title(_("选择登入用户"))
         self.login.geometry("300x160+350+200")
         self.login.resizable(False, False)
-        self.login.iconphoto(False, PhotoImage(file=f"{os.getcwd()}\\Lib\\show.png"))
+        self.login.iconphoto(False, PhotoImage(file=f"{os.getcwd()}\\Lib\\LNSS.png"))
         Label(self.login, text=_("选择登入用户："), font=("楷体", 10)).place(x=20, y=20)
         self.user = Combobox(self.login, values=USER, font=("楷体", 10))
         self.user.current(0)
@@ -734,7 +734,7 @@ class Login:
         self.sign.title(_("注册用户"))
         self.sign.geometry("300x160+350+200")
         self.sign.resizable(False, False)
-        self.sign.iconphoto(False, PhotoImage(file=f"{os.getcwd()}\\Lib\\show.png"))
+        self.sign.iconphoto(False, PhotoImage(file=f"{os.getcwd()}\\Lib\\LNSS.png"))
         Label(self.sign, text=_("注册用户："), font=("楷体", 10)).place(x=20, y=20)
         user = Entry(self.sign, font=("楷体", 10))
         user.place(x=100, y=20, width=160)
@@ -794,7 +794,7 @@ class Demo:
         root.geometry("380x210")
         root.title("LNSS")
         root.resizable(False, False)
-        root.iconphoto(False, PhotoImage(file=f"{os.getcwd()}\\Lib\\show.png"))
+        root.iconphoto(False, PhotoImage(file=f"{os.getcwd()}\\Lib\\LNSS.png"))
         main_page = Notebook(root, padding="5 10 10 10")
 
         server_page = Frame(main_page)
@@ -938,6 +938,7 @@ class Demo:
 
     def get_wifi(self) -> str:
         try:
+            os.popen("netsh wlan show interfaces")
             return (
                 os.popen("netsh wlan show interfaces")
                 .read()
@@ -945,7 +946,8 @@ class Demo:
                 .split(": ")[1]
                 .split("\n")[0]
             )
-        except:
+        except Exception as e:
+            print(e)
             return str(_("无网络"))
 
     def show_more(self) -> None:
@@ -954,7 +956,7 @@ class Demo:
         more = Toplevel(self.window)
         more.resizable(False, False)
         more.geometry("400x320+350+200")
-        more.iconphoto(False, PhotoImage(file=f"{os.getcwd()}\\Lib\\show.png"))
+        more.iconphoto(False, PhotoImage(file=f"{os.getcwd()}\\Lib\\LNSS.png"))
         more.title(_("更多信息"))
         main = Notebook(more)
 
@@ -1009,7 +1011,7 @@ def sign_up() -> None:
     sign.title(_("注册"))
     sign.geometry("400x160+350+200")
     sign.resizable(False, False)
-    sign.iconphoto(False, PhotoImage(file=f"{os.getcwd()}\\Lib\\show.png"))
+    sign.iconphoto(False, PhotoImage(file=f"{os.getcwd()}\\Lib\\LNSS.png"))
     sign.protocol("WM_DELETE_WINDOW", lambda: os._exit(0))
     Label(sign, text=_("让我们开始吧！"), font=("楷体", 12)).place(x=20, y=20)
     Label(sign, text=_("您的用户名是："), font=("楷体", 10)).place(x=20, y=60)
