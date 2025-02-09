@@ -22,6 +22,7 @@ from typing import NoReturn
 import sqlite3
 import gettext
 from configparser import ConfigParser
+import webbrowser
 
 #!! Third Party Libraries
 import socket
@@ -140,7 +141,7 @@ class server:
         )
         about.add_command(
             label=_("帮助(H)"),
-            command=lambda: self.MenuHelp(root),
+            command=lambda: self.help(),
             accelerator="F1",
             underline=4,
         )
@@ -311,6 +312,9 @@ class server:
             font=("华文新魏", 11),
             justify=LEFT,
         ).place(x=120, y=40)
+
+    def help(self) -> None:
+        webbrowser.open("https://github.com/niuzhix/LNSS")
 
     def save_as(self) -> None:
         file = asksaveasfilename(
@@ -496,7 +500,7 @@ class client:
         )
         about.add_command(
             label=_("帮助(H)"),
-            command=lambda: self.MenuHelp(root),
+            command=lambda: self.help(),
             accelerator="F1",
             underline=4,
         )
@@ -557,6 +561,9 @@ class client:
             font=("华文新魏", 11),
             justify=LEFT,
         ).place(x=120, y=40)
+
+    def help(self) -> None:
+        webbrowser.open("https://github.com/niuzhix/LNSS")
 
     def get_data(self, root: Tk, data_from: list) -> None:
         global IP
@@ -946,8 +953,7 @@ class Demo:
                 .split(": ")[1]
                 .split("\n")[0]
             )
-        except Exception as e:
-            print(e)
+        except:
             return str(_("无网络"))
 
     def show_more(self) -> None:
