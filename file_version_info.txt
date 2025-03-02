@@ -3,8 +3,8 @@ VSVersionInfo(
   ffi=FixedFileInfo(
     # filevers and prodvers should be always a tuple with four items: (1, 2, 3, 4)
     # Set not needed items to zero 0.
-    filevers=(2, 1, 0, 3),
-    prodvers=(2, 1, 0, 3),
+    filevers=(2, 1, 0, 4),
+    prodvers=(2, 1, 0, 4),
     # Contains a bitmask that specifies the valid bits 'flags'r
     mask=0x17,
     # Contains a bitmask that specifies the Boolean attributes of the file.
@@ -28,15 +28,15 @@ VSVersionInfo(
         '040904b0',
         [StringStruct('CompanyName', 'Blue Summer Studio'),
         StringStruct('FileDescription', 'Local Network Socket System'),
-        StringStruct('FileVersion', '2.1.0 b1'),
+        StringStruct('FileVersion', '2.1.0 发布版'),
         StringStruct('InternalName', 'LNSS_exe'),
         StringStruct('LegalCopyright', 'Copyright 2025 Blue Summer Studio. All rights reserved.'),
         StringStruct('OriginalFilename', 'LNSS.exe'),
         StringStruct('ProductName', 'LNSS'),
-        StringStruct('ProductVersion', '2.1.0 b1'),
+        StringStruct('ProductVersion', '2.1.0 发布版'),
         StringStruct('CompanyShortName', 'BSS'),
         StringStruct('ProductShortName', 'LNSS'),
-        StringStruct('LastChange', '1025c4bef0a01729b1dc575436308eac8e4ecf2a')])
+        StringStruct('LastChange', 'daf65d80f6fc8d014c1253e554f602aed2d0b24a')])
       ]), 
     VarFileInfo([VarStruct('Translation', [2052, 1200])])
   ]

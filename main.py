@@ -11,7 +11,20 @@ from tkinter import *
 from tkinter.scrolledtext import ScrolledText
 from tkinter.messagebox import askyesnocancel, showwarning
 from tkinter.filedialog import asksaveasfilename
-from tkinter.ttk import Treeview, Notebook, Button, Labelframe, Combobox, Style
+from tkinter.ttk import (
+    Treeview,
+    Notebook,
+    Button,
+    LabelFrame,
+    Combobox,
+    Style,
+    Entry,
+    Label,
+    Checkbutton,
+    Frame,
+    Radiobutton,
+    Scrollbar,
+)
 
 #!! Built In Libraries
 import re
@@ -22,6 +35,7 @@ from typing import NoReturn
 import sqlite3
 import gettext
 from configparser import ConfigParser
+import webbrowser
 
 #!! Third Party Libraries
 import socket
@@ -40,25 +54,43 @@ KEY = b"H5njeRP8RXXy3SNNs_j7AyQWpTs87d_Moq5pcDoeXME="
 is_password_can_use = False
 connected = False
 
-sql_conn = sqlite3.connect(r".\Lib\user.db")
-cursor = sql_conn.cursor()
+try:
+    sql_conn = sqlite3.connect(f"{os.getcwd()}\\Lib\\user.db")
+    cursor = sql_conn.cursor()
+except:
+    showwarning("Error", "Error code: 0x0001\nError message: 数据库文件丢失！")
+    os._exit(-1)
 USER = []
 LOGIN = ""
 
 ini_cursor = ConfigParser()
-ini_cursor.read(f"{os.getcwd()}\\Lib\\config.ini", encoding="gb2312")
-LANG = ini_cursor.get("Settings", "language")
-if LANG == "English":
-    lang = gettext.translation("en", localedir="locales", languages=["en"])
-    lang.install()
-    _ = lang.gettext
-else:
+try:
+    ini_cursor.read(f"{os.getcwd()}\\Lib\\config.ini", encoding="gb2312")
+    LANG = ini_cursor.get("Settings", "language")
+    if LANG == "English":
+        lang = gettext.translation("en", localedir="locales", languages=["en"])
+        lang.install()
+        _ = lang.gettext
+    else:
 
-    def _(message: str) -> str:
-        return message
+        def _(message: str) -> str:
+            return message
+
+except:
+    showwarning("Error", "Error code: 0x0002\nError message: 翻译文件丢失！")
+    os._exit(-1)
+
+if not (
+    os.path.isfile(f"{os.getcwd()}\\Lib\\LNSS.png")
+    and os.path.isfile(f"{os.getcwd()}\\Lib\\LNSS128.png")
+    and os.path.isfile(f"{os.getcwd()}\\Lib\\correct.png")
+    and os.path.isfile(f"{os.getcwd()}\\Lib\\warning.png")
+):
+    showwarning("Error", "Error code: 0x0003\nError message: 图片文件丢失！")
+    os._exit(-1)
 
 
-VERSION = _("v2.0.4 正式版")
+VERSION = _("v2.1.0 发布版")
 
 
 server_users = []
@@ -85,7 +117,7 @@ class server:
 
     def __set__(self, password) -> None:
         global receives, member, menubar, about, other, is_alt, settings_value, settings_option, style, font_size, sends, INPUT
-        font_size = ("楷体", 12)
+        font_size = ("LXGW WenKai GB Screen", 10)
         style = Style()
         style.configure("LNSS.Treeview", font=font_size)
         is_alt = False
@@ -93,9 +125,12 @@ class server:
         root.title(_("socket server"))
         root.geometry("640x480")
         root.resizable(False, False)
-        root.iconphoto(
-            False, Image_load.load(root, image_file=f"{os.getcwd()}\\Lib\\LNSS.png")
-        )
+        try:
+            root.iconphoto(
+                False, Image_load.load(root, image_file=f"{os.getcwd()}\\Lib\\LNSS.png")
+            )
+        except:
+            pass
         receives = ScrolledText(root, background="#f2f2f2", cursor="arrow", wrap=WORD)
         receives.place(x=5, y=0, width=490, height=310)
         receives.tag_config(
@@ -121,17 +156,25 @@ class server:
         member.insert("", END, values=LOGIN + "\n")
         INPUT = StringVar()
         INPUT.set("")
-        sends = Entry(root, width=110, textvariable=INPUT)
+        sends = Entry(root, width=110, textvariable=INPUT, font=font_size)
         sends.place(x=5, y=310, width=545, height=170)
         sending = Button(
-            root, text=_("发送"), command=lambda: self.send(sends.get(), INPUT)
+            root,
+            text=_("发送"),
+            command=lambda: self.send(sends.get(), INPUT),
+            style="LNSS.TButton",
         )
         sending.place(x=552, y=310)
-        expressions = Button(root, text=_("表情"), command=lambda: self.expressions())
+        expressions = Button(
+            root,
+            text=_("表情"),
+            command=lambda: self.expressions(),
+            style="LNSS.TButton",
+        )
         expressions.place(x=552, y=335)
-        menubar = Menu(root)
+        menubar = Menu(root,font=("LXGW WenKai GB Screen", 10))
         root.config(menu=menubar)
-        about = Menu(menubar, tearoff=0)
+        about = Menu(menubar, tearoff=0,font=("LXGW WenKai GB Screen", 10))
         about.add_command(
             label=_("关于...(A)"),
             command=lambda: self.MenuHelp(root),
@@ -144,15 +187,15 @@ class server:
             accelerator="F1",
             underline=4,
         )
-        menubar.add_cascade(label=_("关于(A)"), menu=about, underline=3)
-        save_as = Menu(menubar, tearoff=0)
+        menubar.add_cascade(label=_("关于(A)"), menu=about, underline=3,font=("LXGW WenKai GB Screen", 10))
+        save_as = Menu(menubar, tearoff=0,font=("LXGW WenKai GB Screen", 10))
         save_as.add_command(
             label=_("保存对话(S)"),
             command=lambda: self.save_as(),
             accelerator="Ctrl+S",
             underline=5,
         )
-        menubar.add_cascade(label=_("更多(M)"), menu=save_as, underline=3)
+        menubar.add_cascade(label=_("更多(M)"), menu=save_as, underline=3,font=("LXGW WenKai GB Screen", 10))
         root.bind("<Key>", lambda event: self.onkey(event))
         sends.bind("<Return>", lambda events: self.send(sends.get(), INPUT))
 
@@ -217,6 +260,7 @@ class server:
                     text=server_expression[(i - 1) * 6 + j],
                     command=lambda i=i, j=j: self.expression(i, j),
                     width=3,
+                    style="LNSS.TButton",
                 )
                 button.grid(column=i, row=j)
                 server_buttons[i, j] = button
@@ -444,10 +488,8 @@ class client:
         self.window = window
 
     def __set__(self) -> None:
-        global receives, member, menubar, about, other, is_alt, settings_value, settings_option, style, font_size, sends, INPUT
-        font_size = ("楷体", 12)
-        style = Style()
-        style.configure("LNSS.Treeview", font=font_size)
+        global receives, member, menubar, about, other, is_alt, settings_value, settings_option, font_size, sends, INPUT
+        font_size = ("LXGW WenKai GB Screen", 10)
         is_alt = False
         root = self.window
         root.geometry("640x480")
@@ -480,14 +522,22 @@ class client:
         sends = Entry(root, width=110, textvariable=INPUT)
         sends.place(x=5, y=310, width=545, height=170)
         sending = Button(
-            root, text=_("发送"), command=lambda: self.send(sends.get(), INPUT)
+            root,
+            text=_("发送"),
+            command=lambda: self.send(sends.get(), INPUT),
+            style="LNSS.TButton",
         )
         sending.place(x=552, y=310)
-        expressions = Button(root, text=_("表情"), command=lambda: self.expressions())
+        expressions = Button(
+            root,
+            text=_("表情"),
+            command=lambda: self.expressions(),
+            style="LNSS.TButton",
+        )
         expressions.place(x=552, y=335)
-        menubar = Menu(root)
+        menubar = Menu(root,font=("LXGW WenKai GB Screen", 10))
         root.config(menu=menubar)
-        about = Menu(menubar, tearoff=0)
+        about = Menu(menubar, tearoff=0,font=("LXGW WenKai GB Screen", 10))
         about.add_command(
             label=_("关于...(A)"),
             command=lambda: self.MenuHelp(root),
@@ -496,19 +546,19 @@ class client:
         )
         about.add_command(
             label=_("帮助(H)"),
-            command=lambda: self.MenuHelp(root),
+            command=lambda: webbrowser.open("https:\\niuzhix.github.io\LNSS"),
             accelerator="F1",
             underline=4,
         )
-        menubar.add_cascade(label=_("关于(A)"), menu=about, underline=3)
-        save_as = Menu(menubar, tearoff=0)
+        menubar.add_cascade(label=_("关于(A)"), menu=about, underline=3,font=("LXGW WenKai GB Screen", 10))
+        save_as = Menu(menubar, tearoff=0,font=("LXGW WenKai GB Screen", 10))
         save_as.add_command(
             label=_("保存对话(S)"),
             command=lambda: self.save_as(),
             accelerator="Ctrl+S",
             underline=5,
         )
-        menubar.add_cascade(label=_("更多(M)"), menu=save_as, underline=3)
+        menubar.add_cascade(label=_("更多(M)"), menu=save_as, underline=3,font=("LXGW WenKai GB Screen", 10))
         root.bind("<Key>", lambda event: self.onkey(event))
         sends.bind("<Return>", lambda events: self.send(sends.get(), INPUT))
 
@@ -529,6 +579,7 @@ class client:
                     text=client_expression[(i - 1) * 6 + j],
                     command=lambda i=i, j=j: self.expression(i, j),
                     width=3,
+                    style="LNSS.TButton",
                 )
                 button.grid(column=i, row=j)
                 client_buttons[i, j] = button
@@ -701,19 +752,28 @@ class Login:
         self.login.geometry("300x160+350+200")
         self.login.resizable(False, False)
         self.login.iconphoto(False, PhotoImage(file=f"{os.getcwd()}\\Lib\\LNSS.png"))
-        Label(self.login, text=_("选择登入用户："), font=("楷体", 10)).place(x=20, y=20)
-        self.user = Combobox(self.login, values=USER, font=("楷体", 10))
+        Label(
+            self.login, text=_("选择登入用户："), font=("LXGW WenKai GB Screen", 10)
+        ).place(x=20, y=20)
+        self.user = Combobox(
+            self.login, values=USER, font=("LXGW WenKai GB Screen", 10)
+        )
         self.user.current(0)
         self.user.place(x=20, y=60, width=260)
         # user_info =
         Button(
-            self.login, text=_("注册"), command=lambda: self.sign_up(), width=10
+            self.login,
+            text=_("注册"),
+            command=lambda: self.sign_up(),
+            width=10,
+            style="LNSS.TButton",
         ).place(x=20, y=100)
         Button(
             self.login,
             text=_("确定"),
             command=lambda: self.get_data(self.window, [self.user]),
             width=10,
+            style="LNSS.TButton",
         ).place(x=100, y=100)
 
     def get_data(self, window: Tk | None = None, entry: list[Combobox] = []) -> None:
@@ -723,6 +783,11 @@ class Login:
         if not entry is None:
             self.entry = entry
         LOGIN = self.entry[0].get()
+        sql = """UPDATE user_info SET last_login = ? WHERE name = ? """
+        cursor.execute(
+            sql, (time.strftime("%Y%m%d%H%M%S", time.localtime(time.time())), LOGIN)
+        )
+        sql_conn.commit()
         self.login.destroy()
         main = Demo(server_root)
         main.__set__()
@@ -735,19 +800,22 @@ class Login:
         self.sign.geometry("300x160+350+200")
         self.sign.resizable(False, False)
         self.sign.iconphoto(False, PhotoImage(file=f"{os.getcwd()}\\Lib\\LNSS.png"))
-        Label(self.sign, text=_("注册用户："), font=("楷体", 10)).place(x=20, y=20)
-        user = Entry(self.sign, font=("楷体", 10))
+        Label(
+            self.sign, text=_("注册用户："), font=("LXGW WenKai GB Screen", 10)
+        ).place(x=20, y=20)
+        user = Entry(self.sign, font=("LXGW WenKai GB Screen", 10))
         user.place(x=100, y=20, width=160)
         is_admin = BooleanVar()
         is_admin.set(False)
         Checkbutton(
-            self.sign, text=_("管理员"), font=("楷体", 10), variable=is_admin
+            self.sign, text=_("管理员"), style="LNSS.TCheckbutton", variable=is_admin
         ).place(x=20, y=60)
         Button(
             self.sign,
             text=_("确定"),
             command=lambda: self.get_sign_up_data(self.login, [user, is_admin]),
             width=10,
+            style="LNSS.TButton",
         ).place(x=80, y=100)
 
     def get_sign_up_data(
@@ -789,6 +857,7 @@ class Demo:
             self.window = window
 
     def __set__(self) -> None:
+        font_size = ("LXGW WenKai GB Screen", 10)
         self.custom = None
         root = self.window
         root.geometry("380x210")
@@ -800,7 +869,9 @@ class Demo:
         server_page = Frame(main_page)
         server_page.grid(sticky=(N, S, W, E))
 
-        Label(server_page, text=_("密码：")).grid(column=0, row=0, sticky=NW)
+        Label(server_page, text=_("密码："), font=font_size).grid(
+            column=0, row=0, sticky=NW
+        )
         is_password = StringVar(value="random_password")
         self.is_password = is_password
         Radiobutton(
@@ -808,19 +879,23 @@ class Demo:
             text=_("自定义密码"),
             variable=is_password,
             value="custom_password",
+            style="LNSS.TRadiobutton",
         ).grid(column=1, row=0)
         password = Entry(
-            server_page, validate="focus", validatecommand=self.check_password
+            server_page,
+            validate="focus",
+            validatecommand=self.check_password,
+            font=font_size,
         )
         password.grid(column=2, row=0)
         self.password = password
         self.custom_check = Label(
             server_page,
-            fg="grey",
-            font=("TkDefaultFont", 8),
+            style="None.TLabel",
             text="",
             foreground="red",
             compound=LEFT,
+            font=font_size,
         )
         self.custom_check.grid(column=2, row=1, sticky=W)
         Radiobutton(
@@ -828,66 +903,96 @@ class Demo:
             text=_("随机密码"),
             variable=is_password,
             value="random_password",
+            style="LNSS.TRadiobutton",
         ).grid(column=1, row=2, sticky=W)
 
-        Label(server_page, text=_("网络：")).grid(column=0, row=3, sticky=NW)
-        Label(server_page, text=self.get_wifi()).grid(column=1, row=3, sticky=NW)
+        Label(server_page, text=_("网络："), font=font_size).grid(
+            column=0, row=3, sticky=NW
+        )
+        Label(server_page, text=self.get_wifi(), font=font_size).grid(
+            column=1, row=3, sticky=NW
+        )
 
         Button(
             server_page,
             text=_("创建"),
             command=lambda: smain(self.is_password.get(), self.password.get()),
+            style="LNSS.TButton",
         ).grid(column=0, row=4, columnspan=3)
 
         client_page = Frame(main_page)
         client_page.grid(sticky=(N, S, W, E))
 
-        Label(client_page, text=_("主机地址：")).grid(column=0, row=0, sticky=NW)
-        cip = Entry(client_page, validate="focusout")
+        Label(client_page, text=_("主机地址："), font=font_size).grid(
+            column=0, row=0, sticky=NW
+        )
+        cip = Entry(client_page, validate="focusout", font=font_size)
         cip.grid(column=1, row=0)
 
-        Label(client_page, text=_("密码：")).grid(column=0, row=1, sticky=NW)
+        Label(client_page, text=_("密码："), font=font_size).grid(
+            column=0, row=1, sticky=NW
+        )
         cpassword = Entry(
-            client_page, validate="focusout", validatecommand=self.check_password
+            client_page,
+            validate="focusout",
+            validatecommand=self.check_password,
+            font=font_size,
         )
         cpassword.grid(column=1, row=1)
         self.cpassword = cpassword
 
-        Label(client_page, text=_("网络：")).grid(column=0, row=2, sticky=NW)
-        Label(client_page, text=self.get_wifi()).grid(column=1, row=2, sticky=NW)
+        Label(client_page, text=_("网络："), font=font_size).grid(
+            column=0, row=2, sticky=NW
+        )
+        Label(client_page, text=self.get_wifi(), font=font_size).grid(
+            column=1, row=2, sticky=NW
+        )
 
         Button(
             client_page,
             text=_("加入"),
             command=lambda: cmain(self.cpassword.get(), cip.get()),
+            style="LNSS.TButton",
         ).grid(column=0, row=3, columnspan=3, rowspan=4)
 
         welcome_page = Frame(main_page)
         welcome_page.grid(sticky=(N, S, W, E))
         Label(
-            welcome_page, text=_("你好，%s!") % LOGIN, font=("楷体", 12), anchor=W
+            welcome_page,
+            text=_("你好，%s!") % LOGIN,
+            font=("LXGW WenKai GB Screen", 10),
+            anchor=W,
         ).grid(column=0, row=0, sticky=W)
         Label(
             welcome_page,
             text=_("欢迎使用 LNSS 聊天系统！"),
-            font=("楷体", 10),
+            font=("LXGW WenKai GB Screen", 9),
             anchor=W,
         ).grid(column=0, row=2, sticky=W)
         Label(
-            welcome_page, text=_("版本：%s") % VERSION, font=("楷体", 10), anchor=W
+            welcome_page,
+            text=_("版本：%s") % VERSION,
+            font=("LXGW WenKai GB Screen", 9),
+            anchor=W,
         ).grid(column=0, row=3, sticky=W)
         Label(
             welcome_page,
             text=_("作者：牛 志鑫 & Blue Summer Studio"),
-            font=("楷体", 10),
+            font=("LXGW WenKai GB Screen", 9),
             anchor=W,
         ).grid(column=0, row=4, sticky=W)
-        Button(welcome_page, text=_("更多..."), command=lambda: self.show_more()).grid(
-            column=0, row=5, sticky=W
-        )
-        Button(welcome_page, text=_("设置..."), command=lambda: self.settings()).grid(
-            column=1, row=5
-        )
+        Button(
+            welcome_page,
+            text=_("更多..."),
+            command=lambda: self.show_more(),
+            style="LNSS.TButton",
+        ).grid(column=0, row=5, sticky=W)
+        Button(
+            welcome_page,
+            text=_("设置..."),
+            command=lambda: self.settings(),
+            style="LNSS.TButton",
+        ).grid(column=1, row=5)
 
         main_page.add(server_page, text=_("服务端"))
         main_page.add(client_page, text=_("客户端"))
@@ -910,7 +1015,7 @@ class Demo:
         if (not ret is None) and len(text) <= 8 and len(text) >= 6:
             self.custom_check.config(
                 text=_("密码可用"),
-                foreground="green",
+                style="Can_use.TLabel",
                 image=Image_load.load(
                     self.window, f"{os.getcwd()}\\Lib\\correct.png", (10, 10)
                 ),
@@ -920,7 +1025,7 @@ class Demo:
         else:
             self.custom_check.config(
                 text=_("密码不可用"),
-                foreground="red",
+                style="Can_not_use.TLabel",
                 image=Image_load.load(
                     self.window, f"{os.getcwd()}\\Lib\\warning.png", (10, 10)
                 ),
@@ -963,7 +1068,10 @@ class Demo:
         premit = Frame(main)
         premit_scroll = Scrollbar(premit)
         premit_show = Text(
-            premit, font=("楷体", 10), wrap=WORD, yscrollcommand=premit_scroll.set
+            premit,
+            font=("LXGW WenKai GB Screen", 10),
+            wrap=WORD,
+            yscrollcommand=premit_scroll.set,
         )
         premit_scroll.config(command=premit_show.yview)
         premit_show.insert(END, premits)
@@ -994,9 +1102,12 @@ class Demo:
         language.pack(fill=BOTH)
         notebook.add(language, text=_("语言"))
         notebook.pack(fill=BOTH, expand=1)
-        Button(self.setting, text=_("应用"), command=lambda: self.apply()).pack(
-            side=RIGHT
-        )
+        Button(
+            self.setting,
+            text=_("应用"),
+            command=lambda: self.apply(),
+            style="LNSS.TButton",
+        ).pack(side=RIGHT)
 
     def apply(self) -> None:
         LANG = self.language_famliy.get()
@@ -1013,14 +1124,23 @@ def sign_up() -> None:
     sign.resizable(False, False)
     sign.iconphoto(False, PhotoImage(file=f"{os.getcwd()}\\Lib\\LNSS.png"))
     sign.protocol("WM_DELETE_WINDOW", lambda: os._exit(0))
-    Label(sign, text=_("让我们开始吧！"), font=("楷体", 12)).place(x=20, y=20)
-    Label(sign, text=_("您的用户名是："), font=("楷体", 10)).place(x=20, y=60)
-    user = Entry(sign, font=("楷体", 10))
-    user.place(x=160, y=60)
-    Button(sign, text=_("确定"), command=lambda: sign_up_data(sign, user)).place(
-        x=20, y=100
+    Label(sign, text=_("让我们开始吧！"), font=("LXGW WenKai GB Screen", 10)).place(
+        x=20, y=20
     )
-    Button(sign, text=_("取消"), command=lambda: os._exit(0)).place(x=120, y=100)
+    Label(sign, text=_("您的用户名是："), font=("LXGW WenKai GB Screen", 10)).place(
+        x=20, y=60
+    )
+    user = Entry(sign, font=("LXGW WenKai GB Screen", 10))
+    user.place(x=160, y=60)
+    Button(
+        sign,
+        text=_("确定"),
+        command=lambda: sign_up_data(sign, user),
+        style="LNSS.TButton",
+    ).place(x=20, y=100)
+    Button(
+        sign, text=_("取消"), command=lambda: os._exit(0), style="LNSS.TButton"
+    ).place(x=120, y=100)
     sign.mainloop()
 
 
@@ -1062,6 +1182,12 @@ def main():
     global server_root
     check_table()
     server_root = Tk()
+    Style().configure("Can_use.TLable", fg="green")
+    Style().configure("Can_not_use.TLable", fg="red")
+    Style().configure("None.TLable", fg="black")
+    Style().configure("LNSS.TRadiobutton", font=("LXGW WenKai GB Screen", 9))
+    Style().configure("LNSS.TCheckbutton", font=("LXGW WenKai GB Screen", 9))
+    Style().configure("LNSS.TButton", font=("LXGW WenKai GB Screen", 9))
     Login(server_root).__choose_user__()
     server_root.mainloop()
 
